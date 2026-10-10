@@ -7,7 +7,13 @@ import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.json.JSONObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
 import java.net.URI
 import java.net.URL
 import java.net.HttpURLConnection
@@ -49,21 +55,41 @@ class FreeCinemaProvider : MainAPI() {
         Film("Caminandes 2 - Gran Dillama", 2013, "Un lama ostinato cerca di superare un ostacolo sulle montagne della Patagonia.", "animazione commedia lama"),
         Film("Caminandes 3 - Llamigos", 2016, "Due animali condividono una piccola avventura nella Patagonia innevata.", "animazione commedia lama"),
         Film("Glass Half", 2015, "Due critici d'arte discutono di un dipinto in una commedia animata.", "animazione commedia arte"),
-        Film("Sprite Fright", 2021, "Un gruppo di ragazzi scopre che alcune piccole creature del bosco sono meno innocue del previsto.", "animazione horror commedia")
+        Film("Sprite Fright", 2021, "Un gruppo di ragazzi scopre che alcune piccole creature del bosco sono meno innocue del previsto.", "animazione horror commedia"),
+        Film("Charge", 2022, "In un mondo con poca energia, un uomo entra in una fabbrica di batterie e incontra un robot di sicurezza.", "animazione fantascienza azione robot"),
+        Film("Wing It!", 2023, "Un ingegnere e un aspirante pilota si ritrovano in un'avventura spaziale a bordo di un razzo fuori controllo.", "animazione commedia fantascienza razzo")
     )
 
-    private fun response(film: Film): SearchResponse =
+    // Artwork is optional: a failed metadata lookup must never block playback.
+    // Negative responses are cached briefly to avoid hammering the official API.
+    private data class FilmMetadata(val poster: String?, val minutes: Int?)
+    private data class CachedMetadata(val until: Long, val value: FilmMetadata)
+    private val metadataCache = ConcurrentHashMap<String, CachedMetadata>()
+
+    private fun response(film: Film, metadata: FilmMetadata): SearchResponse =
         newMovieSearchResponse(film.title, film.pageUrl, TvType.Movie) {
             this.year = film.year
+            this.posterUrl = metadata.poster
         }
+
+    private suspend fun decorated(items: List<Film>): List<SearchResponse> = supervisorScope {
+        // Keep concurrent API requests bounded; preserve film ordering.
+        val limiter = Semaphore(6)
+        items.map { film ->
+            async {
+                val metadata = limiter.withPermit { officialMetadata(film) }
+                response(film, metadata)
+            }
+        }.awaitAll()
+    }
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
         return newHomePageResponse(
-            "Open Movies - disponibilita da verificare",
-            if (page == 1) films.map(::response) else emptyList(),
+            "Blender Open Movies - 14 titoli",
+            if (page == 1) decorated(films) else emptyList(),
             false
         )
     }
@@ -81,16 +107,20 @@ class FreeCinemaProvider : MainAPI() {
         return films.filter { f ->
             val searchable = normalized("${f.title} ${f.description} ${f.tags} ${f.year}")
             tokens.all { searchable.contains(it) }
-        }.map(::response)
+        }.let { decorated(it) }
     }
 
     override suspend fun load(url: String): LoadResponse {
         val film = films.firstOrNull { it.pageUrl == url }
             ?: throw IllegalArgumentException("Film non presente nel catalogo libero")
+        val metadata = officialMetadata(film)
         return newMovieLoadResponse(
             film.title, film.pageUrl, TvType.Movie, film.title
         ) {
             year = film.year
+            posterUrl = metadata.poster
+            duration = metadata.minutes
+            tags = film.tags.split(" ").filter { it.isNotBlank() }
             plot = film.description +
                 "\n\nFonte: Blender Studio / Blender Foundation, Open Movies." +
                 " Il flusso viene recuperato dall'API ufficiale al momento della riproduzione, se disponibile." +
@@ -130,6 +160,61 @@ class FreeCinemaProvider : MainAPI() {
             uri.host.equals("video.blender.org", true) &&
             uri.userInfo == null && (uri.port == -1 || uri.port == 443)
     } catch (_: Exception) { false }
+
+    private fun imageFromOfficialPath(value: String): String? {
+        val url = when {
+            value.startsWith("/") && !value.startsWith("//") -> mainUrl + value
+            value.startsWith("https://") -> value
+            else -> return null
+        }
+        if (!officialUrl(url)) return null
+        val path = URI(url).path.lowercase(Locale.ROOT)
+        return url.takeIf {
+            path.endsWith(".jpg") || path.endsWith(".jpeg") ||
+                path.endsWith(".png") || path.endsWith(".webp")
+        }
+    }
+
+    /**
+     * Lightweight, non-authoritative artwork and duration lookup.
+     * The trusted filter intentionally mirrors findRealLinks().
+     * The proven v7 playback resolution remains untouched.
+     */
+    private suspend fun officialMetadata(film: Film): FilmMetadata {
+        val now = System.currentTimeMillis()
+        metadataCache[film.title]?.takeIf { it.until > now }?.let { return it.value }
+        val query = URLEncoder.encode(film.title, "UTF-8")
+        val response = fetchJson(mainUrl + "/api/v1/search/videos?search=" +
+            query + "&count=30")
+        val data = response?.optJSONArray("data")
+        val expected = normalized(film.title)
+        var best: JSONObject? = null
+        if (data != null) for (i in 0 until data.length()) {
+            val entry = data.optJSONObject(i) ?: continue
+            if (!entry.optJSONObject("account")?.optString("name").equals("blender", true))
+                continue
+            val channel = entry.optJSONObject("channel")?.optString("displayName").orEmpty()
+            if (!channel.contains("Blender Open Movies", true)) continue
+            val name = normalized(entry.optString("name"))
+            if (name != expected && !name.startsWith(expected + " ")) continue
+            if (entry.optInt("duration", 0) < 90) continue
+            if (best == null || name == expected) {
+                best = entry
+                if (name == expected) break
+            }
+        }
+        val poster = best?.let { entry ->
+            imageFromOfficialPath(entry.optString("previewPath"))
+                ?: imageFromOfficialPath(entry.optString("thumbnailPath"))
+        }
+        val seconds = best?.optInt("duration", 0) ?: 0
+        val metadata = FilmMetadata(poster, if (seconds > 0) (seconds + 59) / 60 else null)
+        metadataCache[film.title] = CachedMetadata(
+            now + if (best == null) 3 * 60_000L else 30 * 60_000L,
+            metadata
+        )
+        return metadata
+    }
 
     private data class Link(
         val url: String, val type: ExtractorLinkType, val quality: Int
@@ -200,7 +285,11 @@ class FreeCinemaProvider : MainAPI() {
         val links = findRealLinks(film)
         for (item in links.sortedByDescending { it.quality }.take(5)) {
             callback(newExtractorLink(
-                source = name, name = film.title + " - Blender",
+                source = name,
+                name = film.title + " - Blender " +
+                    (if (item.quality == Qualities.Unknown.value) "Auto"
+                     else "${item.quality}p") +
+                    (if (item.type == ExtractorLinkType.M3U8) " HLS" else " MP4"),
                 url = item.url, type = item.type
             ) {
                 quality = item.quality
