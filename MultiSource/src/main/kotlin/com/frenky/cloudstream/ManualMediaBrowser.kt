@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.os.Build
+import android.content.Context
+import android.view.MotionEvent
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.view.WindowManager
 import android.webkit.WebChromeClient
 import android.webkit.CookieManager
@@ -80,6 +83,21 @@ internal object ManualMediaBrowser {
                     if (Build.VERSION.SDK_INT >= 26) settings.safeBrowsingEnabled = true
                 }
 
+                // The WebView is hosted inside an AlertDialog. Explicitly keep its
+                // window eligible for IME input, and let touches retain native
+                // WebView handling (including HTML input focus).
+                browser.setOnTouchListener { view, event ->
+                    if (event.action == MotionEvent.ACTION_UP) {
+                        view.requestFocusFromTouch()
+                        view.post {
+                            val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE)
+                                as? InputMethodManager
+                            imm?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+                        }
+                    }
+                    false
+                }
+
                 var captured: SelectedMedia? = null
                 val dialog = AlertDialog.Builder(activity)
                     .setTitle("Player nel browser (sperimentale)")
@@ -149,7 +167,14 @@ internal object ManualMediaBrowser {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                dialog.window?.clearFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                        WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+                )
+                dialog.window?.setSoftInputMode(
+                    WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+                )
                 browser.requestFocus()
                 browser.loadUrl(initialUrl)
             }
