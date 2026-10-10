@@ -1,4 +1,4 @@
-# Frenky CloudStream — Beta 2
+# Frenky CloudStream — Beta 3
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
@@ -13,7 +13,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 2 **non implementa l'estrazione né la riproduzione dei film e delle puntate**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 3 **non implementa l'estrazione né la riproduzione dei film e delle puntate**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Installazione
 
@@ -25,7 +25,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). Se era già installata, verifica di aver aggiornato a **versione 2** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 3 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 3** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
