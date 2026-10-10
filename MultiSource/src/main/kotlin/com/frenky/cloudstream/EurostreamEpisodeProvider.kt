@@ -269,8 +269,16 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
 
     private data class PublicMedia(
         val url: String,
-        val format: ExtractorLinkType
+        val format: ExtractorLinkType,
+        // An embedded player may require its own page as the ordinary HTTP Referer.
+        val referer: String
     )
+
+    private fun hasHumanChallenge(body: String): Boolean =
+        listOf("cf-turnstile", "g-recaptcha", "hcaptcha", "imhuman",
+            "name=\"captcha\"", "name='captcha'").any {
+            body.contains(it, ignoreCase = true)
+        }
 
     /**
      * Only ordinary HTML5 video sources are candidates. This does not execute
@@ -294,34 +302,47 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
 
     private fun parseHtml5Media(pageUrl: String, documentHtml: String): List<PublicMedia> {
         // Never treat a verification or login form as an accessible video.
-        if (listOf("cf-turnstile", "g-recaptcha", "hcaptcha", "imhuman",
-                "name=\"captcha\"", "name='captcha'").any {
-                documentHtml.contains(it, ignoreCase = true)
-            }) return emptyList()
+        if (hasHumanChallenge(documentHtml)) return emptyList()
 
         val document = Jsoup.parse(documentHtml, pageUrl)
         val found = LinkedHashMap<String, PublicMedia>()
-        for (node in document.select("video[src], video source[src]")) {
-            val media = node.absUrl("src")
+        // Direct HTML5 sources, including standard lazy-loaded data-src attributes.
+        for (node in document.select(
+            "video[src], video source[src], video[data-src], video source[data-src]"
+        )) {
+            val attribute = if (node.hasAttr("src")) "src" else "data-src"
+            val media = node.absUrl(attribute)
             if (!publicHttps(media)) continue
             val type = mediaFormat(media, node.attr("type")) ?: continue
-            found.putIfAbsent(media, PublicMedia(media, type))
+            found.putIfAbsent(media, PublicMedia(media, type, pageUrl))
+            if (found.size == 4) return found.values.toList()
+        }
+        // Public, explicitly declared media URLs in HTML metadata.
+        for (node in document.select(
+            "meta[property=og:video], meta[property=og:video:url], " +
+                "meta[name=twitter:player:stream], meta[itemprop=contentUrl]"
+        )) {
+            val media = node.absUrl("content")
+            if (!publicHttps(media)) continue
+            val type = mediaFormat(media, node.attr("type")) ?: continue
+            found.putIfAbsent(media, PublicMedia(media, type, pageUrl))
             if (found.size == 4) return found.values.toList()
         }
         // Also read plain, directly declared media in common player scripts.
         // This is only text parsing: no packed JS, eval, protected requests,
         // forms or interactive verification are performed.
-        val plainFile = Regex("""(?i)(?:\bfile\b|\bsrc\b)\s*:\s*['"](https://[^'"\s<>]+)['"]""")
+        val plainFile = Regex("""(?i)["']?(?:file|src|contentUrl)["']?\s*:\s*['"](https://[^'"\s<>]+)['"]""")
         for (script in document.select("script")) {
             val data = script.data()
             if (!data.contains("jwplayer", ignoreCase = true) &&
                 !data.contains("sources", ignoreCase = true) &&
-                !data.contains("file:", ignoreCase = true)) continue
+                !data.contains("file:", ignoreCase = true) &&
+                !data.contains("contentUrl", ignoreCase = true)) continue
             for (candidate in plainFile.findAll(data).take(8)) {
                 val media = candidate.groupValues[1].replace("&amp;", "&")
                 if (!publicHttps(media)) continue
                 val type = mediaFormat(media) ?: continue
-                found.putIfAbsent(media, PublicMedia(media, type))
+                found.putIfAbsent(media, PublicMedia(media, type, pageUrl))
                 if (found.size == 4) return found.values.toList()
             }
         }
@@ -370,13 +391,44 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
     }
 
     private suspend fun openlyAvailableHtml5Media(pageUrl: String): List<PublicMedia> {
-        // These are interstitial/verification pages, not video players.
-        if (isIntermediary(pageUrl)) return emptyList()
+        // Only inspect ordinary public pages. Never request verification interstitials.
+        if (isIntermediary(pageUrl)) {
+            Log.i("FrenkyCloudStream", "Eurostream: intermediary is not a public media player")
+            return emptyList()
+        }
         val body = html(pageUrl)
-        if (body.isBlank() || (!body.contains("<video", ignoreCase = true) &&
-                !body.contains("jwplayer", ignoreCase = true) &&
-                !body.contains("sources:", ignoreCase = true))) return emptyList()
-        return parseHtml5Media(pageUrl, body)
+        if (body.isBlank()) {
+            Log.i("FrenkyCloudStream", "Eurostream: player page unavailable at " +
+                (runCatching { URI(pageUrl).host }.getOrNull() ?: "unknown"))
+            return emptyList()
+        }
+        if (hasHumanChallenge(body)) {
+            Log.i("FrenkyCloudStream", "Eurostream: interactive verification at " +
+                (runCatching { URI(pageUrl).host }.getOrNull() ?: "unknown"))
+            return emptyList()
+        }
+        val found = LinkedHashMap<String, PublicMedia>()
+        parseHtml5Media(pageUrl, body).forEach { found.putIfAbsent(it.url, it) }
+        if (found.isNotEmpty()) return found.values.toList()
+
+        // A conventional <iframe src> is an embedded public player page, not a
+        // direct stream. Inspect at most two of them, one level deep; do not
+        // execute JavaScript, follow further frames or handle access challenges.
+        val document = Jsoup.parse(body, pageUrl)
+        val frames = document.select("iframe[src]").map { it.absUrl("src") }
+            .filter { publicHttps(it) && !isIntermediary(it) && it != pageUrl }
+            .distinct().take(2)
+        for (frameUrl in frames) {
+            val frameBody = html(frameUrl)
+            if (frameBody.isBlank() || hasHumanChallenge(frameBody)) continue
+            parseHtml5Media(frameUrl, frameBody).forEach {
+                found.putIfAbsent(it.url, it)
+            }
+            if (found.size >= 4) break
+        }
+        Log.i("FrenkyCloudStream", "Eurostream: public HTML5 scan found " +
+            found.size + " media (checked " + frames.size + " embedded pages)")
+        return found.values.take(4)
     }
 
     override suspend fun loadLinks(
@@ -416,6 +468,27 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
             // Some known URL shorteners return a plain HTTP 301/302/307.
             // A CAPTCHA or JavaScript landing page never yields a video URL.
             val destination = if (isIntermediary(url)) publicHttpDestination(url) else url
+            // A normal HTTP redirect may lead straight to MP4/HLS/DASH.
+            // Check this before passing the destination to page extractors.
+            val redirectedFormat = mediaFormat(destination)
+            if (redirectedFormat != null && seen.add(destination)) {
+                callback(newExtractorLink(
+                    source = name,
+                    name = label + " (redirect)",
+                    url = destination,
+                    type = redirectedFormat
+                ) {
+                    referer = origin
+                    quality = Qualities.Unknown.value
+                })
+                emitted++
+                continue
+            }
+            if (isIntermediary(destination)) {
+                Log.i("FrenkyCloudStream", "Eurostream: link remains on intermediary " +
+                    (runCatching { URI(destination).host }.getOrNull() ?: "unknown") +
+                    "; cannot resolve an interactive page")
+            }
             val candidates = linkedSetOf(url, destination)
             for (candidate in candidates) {
                 if (emitted != before || isIntermediary(candidate)) continue
@@ -434,12 +507,11 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
             }
             if (emitted == before) {
                 val host = runCatching { URI(destination).host }.getOrNull().orEmpty()
-                Log.i("FrenkyCloudStream", "Eurostream: no supported extractor for " +
-                    host + " (possibly an interactive verification page)")
+                Log.i("FrenkyCloudStream", "Eurostream: no playable result from standard extractor at " +
+                    host)
             }
-            // A public, plain HTML5 video element may be playable even when
-            // CloudStream has no named extractor for its host.
-            // Never interpret iframes, script-generated URLs, or challenges as streams.
+            // A public HTML5 player may be playable even without a named extractor.
+            // Only direct media and ordinary public iframe pages are inspected.
             if (emitted == before) {
                 try {
                     for (media in openlyAvailableHtml5Media(destination)) {
@@ -450,7 +522,7 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                             url = media.url,
                             type = media.format
                         ) {
-                            referer = destination
+                            referer = media.referer
                             quality = Qualities.Unknown.value
                         })
                         emitted++
