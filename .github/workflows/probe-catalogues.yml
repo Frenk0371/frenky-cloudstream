@@ -27,5 +27,10 @@ jobs:
           git add reports/catalogue_probe.json
           if ! git diff --cached --quiet; then
             git commit -m "test: summarize public catalogue HTML"
-            git push
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then exit 0; fi
+              sleep 3
+            done
+            exit 1
           fi
