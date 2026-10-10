@@ -1,7 +1,7 @@
-version = 31
+version = 32
 
 cloudstream {
-    description = "Restore verified v28 manual player"
+    description = "Improved Eurostream series poster extraction"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
