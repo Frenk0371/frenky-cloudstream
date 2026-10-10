@@ -31,6 +31,7 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
         val encoded = URLEncoder.encode(term, "UTF-8")
         val searchUrl = when (source.searchMode) {
             SearchMode.WORDPRESS -> "${mainUrl.trimEnd('/')}/?s=$encoded"
+            SearchMode.WORDPRESS_ROOT -> URI(mainUrl).let { "${it.scheme}://${it.host}/?s=$encoded" }
             SearchMode.DLE_GET -> "${mainUrl.trimEnd('/')}/?do=search&subaction=search&story=$encoded"
             SearchMode.NONE -> return emptyList()
         }
