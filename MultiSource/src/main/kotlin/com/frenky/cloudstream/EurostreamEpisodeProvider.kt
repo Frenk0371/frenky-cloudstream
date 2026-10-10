@@ -245,11 +245,11 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             .asSequence()
             .filter { image ->
                 val label = image.attr("alt").lowercase(Locale.ROOT)
-                    .replace(Regex("""\\b(streaming|serie tv|ita|subita)\\b"""), "")
-                    .replace(Regex("""[^\\p{L}\\p{N}]+"""), " ").trim()
+                    .replace(Regex("""\b(streaming|serie tv|ita|subita)\b"""), "")
+                    .replace(Regex("""[^\p{L}\p{N}]+"""), " ").trim()
                 val pageTitle = title.lowercase(Locale.ROOT)
-                    .replace(Regex("""\\b(streaming|serie tv|ita|subita)\\b"""), "")
-                    .replace(Regex("""[^\\p{L}\\p{N}]+"""), " ").trim()
+                    .replace(Regex("""\b(streaming|serie tv|ita|subita)\b"""), "")
+                    .replace(Regex("""[^\p{L}\p{N}]+"""), " ").trim()
                 label.isNotBlank() && pageTitle.isNotBlank() &&
                     (label == pageTitle || label == pageTitle.removePrefix("the ") ||
                         pageTitle == label.removePrefix("the "))
