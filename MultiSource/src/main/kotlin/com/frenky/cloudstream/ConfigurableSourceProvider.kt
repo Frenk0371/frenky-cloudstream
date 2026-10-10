@@ -1,6 +1,7 @@
 package com.frenky.cloudstream
 
 import com.lagradost.cloudstream3.*
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -115,8 +116,9 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
                 SearchMode.NONE -> return emptyList()
             }
             val document = try {
-                Jsoup.parse(getHtml(searchUrl), mainUrl)
-            } catch (_: Exception) {
+                Jsoup.parse(getHtml(searchUrl), searchUrl)
+            } catch (error: Exception) {
+                Log.w("FrenkyCloudStream", "Search failed for ${source.id}: ${error.javaClass.simpleName}")
                 continue // Failed variant must not prevent fallback to another spelling.
             }
             for (anchor in document.select("a[href]")) {
@@ -125,9 +127,12 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
                 if (!uri.scheme.equals("https", true) ||
                     uri.host?.lowercase(Locale.ROOT)?.removePrefix("www.") != expectedHost ||
                     uri.path.isNullOrBlank() || uri.path == "/") continue
-                val img = anchor.selectFirst("img")
+                val img = anchor.selectFirst("img") ?: anchor.parent()?.selectFirst("img")
+                val card = anchor.closest("article, .post, .item, .result, .search-result")
                 val options = listOf(
                     anchor.attr("title"),
+                    anchor.attr("aria-label"),
+                    card?.selectFirst("h1,h2,h3,h4,.entry-title,.post-title")?.text().orEmpty(),
                     anchor.selectFirst("h1,h2,h3,h4")?.text().orEmpty(),
                     img?.attr("alt").orEmpty(),
                     anchor.text()
@@ -204,7 +209,11 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
                 setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; FrenkyCatalogue/1.0)")
                 setRequestProperty("Accept", "text/html,application/xhtml+xml")
             }
-            if (connection.responseCode != 200) return@withContext ""
+            val status = connection.responseCode
+            if (status != 200) {
+                Log.w("FrenkyCloudStream", "Catalogue ${source.id} HTTP $status")
+                return@withContext ""
+            }
             val out = ByteArrayOutputStream()
             connection.inputStream.use { input ->
                 val chunk = ByteArray(8192)
@@ -216,7 +225,9 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
                     total += length
                 }
             }
-            out.toString(Charsets.UTF_8.name())
+            val body = out.toString(Charsets.UTF_8.name())
+            Log.i("FrenkyCloudStream", "Catalogue ${source.id}: received ${body.length} chars")
+            body
         } finally {
             connection?.disconnect()
         }
