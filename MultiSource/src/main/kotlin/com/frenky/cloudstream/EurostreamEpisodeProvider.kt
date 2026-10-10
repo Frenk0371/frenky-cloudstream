@@ -266,6 +266,65 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
      * shorteners and hosts will not resolve; this must return false in those
      * cases, rather than offering an HTML page as if it were an MP4 file.
      */
+
+    private data class PublicMedia(
+        val url: String,
+        val format: ExtractorLinkType
+    )
+
+    /**
+     * Only ordinary HTML5 video sources are candidates. This does not execute
+     * JavaScript, submit forms, impersonate a user or pass human challenges.
+     */
+    private fun mediaFormat(url: String, typeHint: String = ""): ExtractorLinkType? {
+        val path = runCatching { URI(url).path.lowercase(Locale.ROOT) }
+            .getOrNull().orEmpty()
+        val mime = typeHint.substringBefore(';').lowercase(Locale.ROOT).trim()
+        return when {
+            path.endsWith(".m3u8") || mime in
+                setOf("application/x-mpegurl", "application/vnd.apple.mpegurl") ->
+                ExtractorLinkType.M3U8
+            path.endsWith(".mpd") || mime == "application/dash+xml" ->
+                ExtractorLinkType.DASH
+            path.endsWith(".mp4") || mime == "video/mp4" ->
+                ExtractorLinkType.VIDEO
+            else -> null
+        }
+    }
+
+    private fun parseHtml5Media(pageUrl: String, documentHtml: String): List<PublicMedia> {
+        // Never treat a verification or login form as an accessible video.
+        if (listOf("cf-turnstile", "g-recaptcha", "hcaptcha", "imhuman",
+                "name=\"captcha\"", "name='captcha'").any {
+                documentHtml.contains(it, ignoreCase = true)
+            }) return emptyList()
+
+        val document = Jsoup.parse(documentHtml, pageUrl)
+        val found = LinkedHashMap<String, PublicMedia>()
+        for (node in document.select("video[src], video source[src]")) {
+            val media = node.absUrl("src")
+            if (!publicHttps(media)) continue
+            val type = mediaFormat(media, node.attr("type")) ?: continue
+            found.putIfAbsent(media, PublicMedia(media, type))
+            if (found.size == 4) break
+        }
+        return found.values.toList()
+    }
+
+    private suspend fun openlyAvailableHtml5Media(pageUrl: String): List<PublicMedia> {
+        val host = runCatching { URI(pageUrl).host?.lowercase(Locale.ROOT) }
+            .getOrNull().orEmpty()
+        // These are interstitial/verification pages, not video players.
+        if (host == "clicka.cc" || host.endsWith(".clicka.cc") ||
+            host == "safego.cc" || host.endsWith(".safego.cc")) return emptyList()
+
+        val body = html(pageUrl)
+        if (body.isBlank() || !body.contains("<video", ignoreCase = true)) {
+            return emptyList()
+        }
+        return parseHtml5Media(pageUrl, body)
+    }
+
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -281,15 +340,14 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
             val player = players.optJSONObject(i) ?: continue
             val url = player.optString("url")
             if (!publicHttps(url) || !seen.add(url)) continue
-            val path = runCatching { URI(url).path.lowercase(Locale.ROOT) }.getOrNull() ?: continue
             val label = player.optString("name", "Server")
-            if (path.endsWith(".mp4") || path.endsWith(".m3u8")) {
+            val directFormat = mediaFormat(url)
+            if (directFormat != null) {
                 callback(newExtractorLink(
                     source = name,
                     name = label,
                     url = url,
-                    type = if (path.endsWith(".m3u8")) ExtractorLinkType.M3U8
-                        else ExtractorLinkType.VIDEO
+                    type = directFormat
                 ) {
                     referer = origin
                     quality = Qualities.Unknown.value
@@ -297,8 +355,8 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 emitted++
                 continue
             }
+            val before = emitted
             try {
-                val before = emitted
                 loadExtractor(url, origin, subtitleCallback) { video ->
                     if (publicHttps(video.url)) {
                         callback(video)
@@ -315,6 +373,30 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 val host = runCatching { URI(url).host }.getOrNull().orEmpty()
                 Log.w("FrenkyCloudStream", "Eurostream: extractor failure for " +
                     host + " (" + error.javaClass.simpleName + ")")
+            }
+            // A public, plain HTML5 video element may be playable even when
+            // CloudStream has no named extractor for its host.
+            // Never interpret iframes, script-generated URLs, or challenges as streams.
+            if (emitted == before) {
+                try {
+                    for (media in openlyAvailableHtml5Media(url)) {
+                        if (!seen.add(media.url)) continue
+                        callback(newExtractorLink(
+                            source = name,
+                            name = label + " HTML5",
+                            url = media.url,
+                            type = media.format
+                        ) {
+                            referer = url
+                            quality = Qualities.Unknown.value
+                        })
+                        emitted++
+                    }
+                } catch (error: Exception) {
+                    val host = runCatching { URI(url).host }.getOrNull().orEmpty()
+                    Log.w("FrenkyCloudStream", "Eurostream: HTML5 parse error at " +
+                        host + " (" + error.javaClass.simpleName + ")")
+                }
             }
         }
         if (emitted == 0) {

@@ -1,6 +1,24 @@
-# Frenky CloudStream — Beta 13
+# Frenky CloudStream — Beta 14
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
+
+## Beta 14: lettore HTML5 standard e MPEG-DASH
+
+- Aggiunto il supporto a URL diretti **MP4, HLS (.m3u8) e DASH (.mpd)**.
+- Quando nessun estrattore CloudStream ottiene un media, l'estensione può
+  individuare tag HTML5 \`<video src>\` o \`<video><source src>\` presenti in una
+  normale pagina pubblica accessibile senza interazione. Il video deve avere
+  un URL HTTPS e un formato riconosciuto.
+- Nessuna esecuzione di JavaScript, nessuna risoluzione di iframe nascosti,
+  nessun tentativo di superare CAPTCHA o di accedere a stream protetti.
+- I collegamenti \`clicka.cc\` e \`safego.cc\` non sono trattati come player:
+  sono intermediari che possono richiedere verifiche.
+- **The Sentinel / DeltaBit:** la sua riproduzione nativa NON è stata
+  dimostrata. La presenza del video in Safari non prova che esista un flusso
+  direttamente accessibile dalla repository. Questa versione aumenta la
+  compatibilità con i player HTML5 standard ma non risolve necessariamente
+  i server specifici mostrati nelle schermate.
+- Conservati catalogo a quattro stagioni, metadati per episodio e altri provider.
 
 ## Beta 13: diagnosi per puntata e apertura nel browser
 
@@ -45,7 +63,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 13 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 14 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -102,7 +120,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 13 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 13** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 14 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 14** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
