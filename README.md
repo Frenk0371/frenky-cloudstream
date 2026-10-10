@@ -1,60 +1,53 @@
-# Frenky CloudStream — beta tecnica
+# Frenky CloudStream — Beta 2
 
-Repository personale CloudStream con **sei provider segnaposto** e gestione centralizzata dei domini. Supporta Fire TV e tablet Android tramite CloudStream.
+Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
-## Stato verificato (10 ottobre 2026)
+## Stato delle fonti (10 ottobre 2026)
 
-- ✅ Repository GitHub pubblicata
-- ✅ Compilazione CloudStream riuscita su GitHub Actions (workflow [build](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml))
-- ✅ `MultiSource.cs3` e `plugins.json` pubblicati nel branch `builds`
-- ✅ Primo controllo automatico dei sei domini eseguito con successo ([report](reports/latest.json))
-- ⚠️ I sei provider sono **solo bozze**: non implementano ancora ricerca di titoli, elenco episodi o riproduzione di video
-- ⚠️ Installare il pacchetto **non** significa poter vedere film o serie da questi siti
+| Fonte | Ricerca titoli | Note |
+|---|---|---|
+| Eurostream | Codice integrato; URL di ricerca verificato | Ricerca WordPress `?s=...` |
+| GuardaSerie | Codice integrato; URL di ricerca verificato | Ricerca DLE `do=search` |
+| Il Genio dello Streaming | Codice integrato; URL di ricerca verificato | Ricerca DLE `do=search` |
+| CB01 | Codice integrato; URL di ricerca verificato | Ricerca WordPress dalla radice del dominio |
+| AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
+| StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-## Aggiunta del repository a CloudStream
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 2 **non implementa l'estrazione né la riproduzione dei film e delle puntate**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
-Nel menu CloudStream vai a **Impostazioni → Estensioni → Aggiungi repository** e inserisci:
+## Installazione
+
+CloudStream → **Impostazioni → Estensioni → Aggiungi repository**.
+
+Incolla:
 
 ```text
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Nel catalogo delle estensioni della repository cerca **MultiSource** (contrassegnata come beta). La disponibilità di estensioni beta può dipendere dalla versione di CloudStream.
+Installa la voce **MultiSource** (beta). Se era già installata, verifica di aver aggiornato a **versione 2** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
-Manifest: [repo.json](repo.json) · [plugins.json compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [build .cs3](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
+Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
-## Fonti iniziali (indirizzi indicati dall'utente)
+## Aggiornamento dei domini
 
-1. AltaDefinizione — altadefinizionex.surf
-2. Eurostream — eurostream.pics
-3. GuardaSerie — guardaseriex.click
-4. StreamingCommunity — streamingcommunityz.rip
-5. Il Genio dello Streaming — il-geniodellostreaming.vip
-6. CB01 — cbin99.mobi/casa/
+- Sei URL registrati in [config/domains.json](config/domains.json).
+- [GitHub Actions](.github/workflows/check-domains.yml) controlla i domini ogni giorno e registra il risultato in [reports/latest.json](reports/latest.json).
+- Reindirizzamento HTTPS permanente (301/308) con stesso nome principale → aggiornamento centralizzato dopo i controlli previsti.
+- Cambio di nome, redirect temporaneo, sito irraggiungibile → segnalazione e **verifica manuale**.
+- Nessun sistema può identificare con certezza un nuovo dominio quando il precedente scompare senza reindirizzamenti verificabili.
 
-Sono solamente gli indirizzi iniziali: **non è stata verificata alcuna licenza di distribuzione** e il progetto non contiene software per estrarre video o aggirare protezioni.
+L'estensione consulta la configurazione remota quando effettua una ricerca e usa l'URL originale in caso di errore di rete.
 
-## Aggiornamento centralizzato dei domini
+## Verifiche di sviluppo
 
-Il file [config/domains.json](config/domains.json) mantiene gli indirizzi correnti. La GitHub Action [check-domains.yml](.github/workflows/check-domains.yml) effettua un controllo ogni giorno e, dopo i test, registra i risultati in [reports/latest.json](reports/latest.json).
-
-- Reindirizzamento HTTPS **301/308** verso hostname con stesso nome principale → aggiorna automaticamente il registro
-- Destinazione diversa, redirect temporaneo, errore di accesso o DNS → **non** aggiorna; segnala la necessità di revisione
-- Scomparsa senza redirect → il sistema **non può indovinare** il nuovo dominio
-- Modifica del layout di un sito → servirà un nuovo adattatore; cambiare dominio non basta
-
-Il criterio dei redirect è prudente, ma non prova l'identità né la liceità della destinazione.
-
-Le estensioni possono leggere la configurazione aggiornata senza reinstallazione. Attualmente questa lettura avviene durante la ricerca dei provider segnaposto, che ritorna tuttavia un risultato vuoto.
-
-## Comandi per sviluppo e verifiche
+Sonda dei percorsi di ricerca: [report](reports/catalogue_probe.json). Non è un test di riproduzione video.
 
 ```sh
 python -m unittest discover -s tests -v
 python tools/check_domains.py
-python tools/check_domains.py --apply
+python tools/probe_catalogues.py
 gradle make makePluginsJson
 ```
 
-Per sviluppare provider reali occorre implementare ricerca, parsing delle schede e gestione degli episodi soltanto per fonti con accesso e distribuzione autorizzati. Evitare estrazione non autorizzata, aggiramento di DRM o controlli anti-bot.
-
+Per sviluppare un sistema di riproduzione occorre usare soltanto flussi e fonti per cui esistano autorizzazioni adeguate, senza aggirare DRM o controlli di accesso.
