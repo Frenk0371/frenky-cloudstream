@@ -201,7 +201,11 @@ internal object ManualMediaBrowser {
                     activity.runOnUiThread { if (dialog.isShowing) dialog.dismiss() }
                 }
                 dialog.show()
+                // Expand the Android dialog to the tablet's available display.
+                // Keep the WebView's viewport, navigation and media interception intact.
                 dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                dialog.window?.decorView?.setPadding(0, 0, 0, 0)
                 dialog.window?.setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
