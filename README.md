@@ -1,4 +1,13 @@
-# Frenky CloudStream — Beta 15
+# Frenky CloudStream — Beta 16
+
+## Beta 16: diagnosi The Sentinel (log Android del 10 ottobre)
+
+- I messaggi `no supported extractor for safego.cc` e `turbovid.me` mostrano che per l'episodio provato non e stato ottenuto un flusso riproducibile: il lettore non e la causa iniziale.
+- Il filtro nomi riconosce ora anche `Delta Bit`, `Delta-Bit` e `DeltaBit`; la presenza del nome non prova che il server sia effettivamente raggiungibile.
+- Sono ammessi fino a tre redirect HTTP standard anche da SafeGo, senza elaborare pagine di verifica, CAPTCHA, JavaScript o limitazioni di accesso.
+- Il log indica **nome visibile del server e dominio** per ogni tentativo, cosi da identificare a quale host corrisponde la voce Delta Bit di una puntata.
+- La riproduzione di The Sentinel con Delta Bit resta **da verificare sul dispositivo**. La Beta 16 non aggiunge estrattori per host non supportati.
+
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
