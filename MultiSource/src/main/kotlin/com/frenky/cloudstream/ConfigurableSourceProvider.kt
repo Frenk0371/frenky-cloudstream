@@ -21,7 +21,14 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
     override var lang: String = "it"
     override val supportedTypes = if (source.isSeries) setOf(TvType.TvSeries)
         else setOf(TvType.Movie, TvType.TvSeries)
-    override val hasMainPage = false
+    // CloudStream hides providers without a main page from the home source selector.
+    // This metadata-only provider exposes an empty home page so it can be selected
+    // and searched without pretending to have a browsable video catalogue.
+    override val hasMainPage = true
+
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        return newHomePageResponse(request, emptyList(), false)
+    }
 
     override suspend fun search(query: String): List<SearchResponse> {
         val term = query.trim().take(80)
