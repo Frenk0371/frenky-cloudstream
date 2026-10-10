@@ -165,6 +165,11 @@ internal object ManualMediaBrowser {
                         return null // Let the browser perform the actual request.
                     }
                 }
+                // Give the embedded page a real, screen-sized WebView area.
+                // The site may have its own small content panel; this changes only
+                // the Android container, not the website viewport or media requests.
+                browser.setBackgroundColor(android.graphics.Color.WHITE)
+                browser.setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
                 layout.addView(status, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(browser, LinearLayout.LayoutParams(
@@ -183,6 +188,7 @@ internal object ManualMediaBrowser {
                     activity.runOnUiThread { if (dialog.isShowing) dialog.dismiss() }
                 }
                 dialog.show()
+                dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
                 dialog.window?.setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
