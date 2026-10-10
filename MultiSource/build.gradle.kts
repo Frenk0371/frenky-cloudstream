@@ -1,7 +1,7 @@
-version = 5
+version = 6
 
 cloudstream {
-    description = "Metadata search and three independent public player tests; no third-party video extraction"
+    description = "12 official Blender open movies with native playback + catalog metadata search"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
