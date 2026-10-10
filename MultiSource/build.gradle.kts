@@ -1,7 +1,7 @@
-version = 18
+version = 19
 
 cloudstream {
-    description = "Public HTML5 lazy video and iframe handling, HTTP diagnostics"
+    description = "Experimental manual player browser, HTML5 recognition and HTTP diagnostics"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
