@@ -1,6 +1,6 @@
 package com.frenky.cloudstream
 
-enum class SearchMode { NONE, WORDPRESS, DLE_GET }
+enum class SearchMode { NONE, WORDPRESS, WORDPRESS_ROOT, DLE_GET }
 
 data class Source(
     val id: String,
@@ -17,6 +17,6 @@ object SourceList {
         Source("guardaserie", "GuardaSerie", "https://guardaseriex.click/", SearchMode.DLE_GET, true),
         Source("streamingcommunity", "StreamingCommunity (richiede JavaScript)", "https://streamingcommunityz.rip/"),
         Source("ilgenio", "Il Genio dello Streaming", "https://il-geniodellostreaming.vip/", SearchMode.DLE_GET),
-        Source("cb01", "CB01 (non verificato)", "https://cbin99.mobi/casa/")
+        Source("cb01", "CB01", "https://cbin99.mobi/casa/", SearchMode.WORDPRESS_ROOT)
     )
 }
