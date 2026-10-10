@@ -80,7 +80,12 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 setRequestProperty("Accept", "text/html,application/xhtml+xml")
                 setRequestProperty("Accept-Language", "it-IT,it;q=0.9,en;q=0.6")
             }
-            if (connection.responseCode != 200) return@withContext ""
+            val status = connection.responseCode
+            if (status != 200) {
+                Log.i("FrenkyCloudStream", "Eurostream: HTTP " + status +
+                    " at " + (runCatching { URI(url).host }.getOrNull() ?: "unknown"))
+                return@withContext ""
+            }
             connection.inputStream.use { input ->
                 val out = java.io.ByteArrayOutputStream()
                 val buf = ByteArray(8192)
