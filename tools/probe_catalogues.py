@@ -52,9 +52,10 @@ class CatalogueParser(HTMLParser):
                 self.anchors.append(a)
             self._anchor = None
 
-def request(url):
+def request(url, method='GET', fields=None):
     try:
-        req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/html"})
+        data = urlencode(fields).encode("utf-8") if method == "POST" and fields else None
+        req = Request(url, data=data, headers={"User-Agent": USER_AGENT, "Accept": "text/html"})
         with urlopen(req, timeout=10) as response:
             raw = response.read(250000)
             final = response.url
@@ -78,9 +79,13 @@ def probe(src):
         ("homepage", base),
         ("wordpress_s", base + "?" + urlencode({"s": SEARCH})),
         ("query_search", base + "?" + urlencode({"search": SEARCH})),
+        ("dle_get", base + "?" + urlencode({"do":"search","subaction":"search","story":SEARCH})),
+        ("dle_post", base),
     ]
     return {"id":src["id"], "name":src["name"],
-            "variants":{name:request(url) for name, url in variants}}
+            "variants":{name:request(url, "POST" if name == "dle_post" else "GET",
+              {"do":"search","subaction":"search","story":SEARCH} if name == "dle_post" else None)
+              for name, url in variants}}
 
 def main():
     sources = json.loads(CONFIG.read_text(encoding="utf-8"))["sources"]
