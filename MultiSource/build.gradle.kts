@@ -1,4 +1,4 @@
-version = 2
+version = 3
 
 cloudstream {
     description = "Title and metadata search for 4 public HTML catalogues; no video extraction"
