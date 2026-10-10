@@ -158,13 +158,13 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
                         val listing = found.getOrPut(active!!) { EpisodeListing(active!!) }
                         // Preserve the episode title displayed in the public listing.
                         val rawTitle = value.substring(it.range.last + 1)
-                            .split(Regex("""\\s+[–—-]\\s+"""), limit = 2).first()
+                            .split(Regex("""\s+[–—-]\s+"""), limit = 2).first()
                             .trim(' ', ':', '-', '–', '—')
                             .trim()
                         if (listing.title.isBlank() &&
                             rawTitle.length in 2..120 &&
                             !supportedLabels.containsMatchIn(rawTitle) &&
-                            !rawTitle.matches(Regex("""(?i)episodi?[oa]?\\s*\\d*"""))) {
+                            !rawTitle.matches(Regex("""(?i)episodi?[oa]?\s*\d*"""))) {
                             listing.title = rawTitle
                         }
                     }
