@@ -180,9 +180,23 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse {
-        val expected = URI(mainUrl).host?.removePrefix("www.")
-        val itemHost = URI(url).host?.removePrefix("www.")
-        if (expected == null || expected != itemHost || !url.startsWith("https://"))
+        // CloudStream can load a previously found search result after a
+        // provider instance has been recreated and mainUrl reset to fallback.
+        mainUrl = DomainRegistry.resolve(source.id, source.fallbackUrl)
+        val expected = URI(mainUrl).host?.lowercase(Locale.ROOT)?.removePrefix("www.")
+        val itemUri = URI(url)
+        val itemHost = itemUri.host?.lowercase(Locale.ROOT)?.removePrefix("www.")
+        // This specific host is observed in StreamingCommunity search results.
+        // Only explicit provider domains are permitted, not arbitrary URLs.
+        val knownHosts = when (source.id) {
+            "streamingcommunity" -> setOfNotNull(expected,
+                URI(source.fallbackUrl).host?.removePrefix("www."),
+                "streamingunity.dog")
+            else -> setOfNotNull(expected)
+        }
+        if (!itemUri.scheme.equals("https", ignoreCase = true) ||
+            itemUri.userInfo != null || itemUri.port !in setOf(-1, 443) ||
+            itemHost == null || itemHost !in knownHosts)
             throw IllegalArgumentException("URL fuori dal provider")
         val doc: Document = Jsoup.parse(getHtml(url), url)
         val title = doc.selectFirst("h1")?.text()?.trim()
