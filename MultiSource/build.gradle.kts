@@ -1,7 +1,7 @@
-version = 21
+version = 22
 
 cloudstream {
-    description = "Improved embedded player layout and keyboard handling"
+    description = "Restored verified manual player playback"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
