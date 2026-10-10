@@ -1,5 +1,6 @@
 package com.frenky.cloudstream
 
+import android.app.Activity
 import android.util.Log
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -19,6 +20,7 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.util.Locale
+import java.lang.ref.WeakReference
 
 /**
  * Eurostream catalogue adapter: recognizes actual seasons and episodes from
@@ -28,7 +30,8 @@ import java.util.Locale
  * A listing link is NOT a guaranteed playable media stream. Never claim
  * success unless an extractor actually emits an ExtractorLink.
  */
-class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
+class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = null) : MainAPI() {
+    private val browserActivity = WeakReference(owner)
     override var mainUrl: String = source.fallbackUrl
     override var name: String = source.displayName
     override var lang: String = "it"
@@ -539,6 +542,39 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                     val host = runCatching { URI(destination).host }.getOrNull().orEmpty()
                     Log.w("FrenkyCloudStream", "Eurostream: HTML5 parse error at " +
                         host + " (" + error.javaClass.simpleName + ")")
+                }
+            }
+        }
+        if (emitted == 0) {
+            // The user can perform the website's ordinary countdown/ad interactions.
+            // This does not skip a challenge or fabricate a stream URL.
+            val intermediary = (0 until minOf(players.length(), 10))
+                .mapNotNull { players.optJSONObject(it)?.optString("url") }
+                .firstOrNull { publicHttps(it) && isIntermediary(it) }
+            val activity = browserActivity.get()
+            if (intermediary != null && activity != null && !activity.isFinishing) {
+                Log.i("FrenkyCloudStream", "Eurostream: offering manual public browser")
+                try {
+                    val chosen = ManualMediaBrowser.open(activity, intermediary)
+                    val videoType = chosen?.let { mediaFormat(it.url) }
+                    if (chosen != null && videoType != null && seen.add(chosen.url)) {
+                        callback(newExtractorLink(
+                            source = name,
+                            name = "Video confermato manualmente",
+                            url = chosen.url,
+                            type = videoType
+                        ) {
+                            referer = chosen.referer
+                            quality = Qualities.Unknown.value
+                            chosen.cookie?.let { cookie ->
+                                headers = mapOf("Cookie" to cookie)
+                            }
+                        })
+                        emitted++
+                    }
+                } catch (error: Exception) {
+                    Log.w("FrenkyCloudStream", "Eurostream: manual browser error (" +
+                        error.javaClass.simpleName + ")")
                 }
             }
         }
