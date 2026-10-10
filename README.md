@@ -1,4 +1,4 @@
-# Frenky CloudStream — Beta 6
+# Frenky CloudStream — Beta 7
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
@@ -13,7 +13,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 6 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 7 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -21,16 +21,15 @@ La voce **Frenky - Test Player** contiene ora tre clip di prova indipendenti: **
 
 L'esperimento è volutamente separato dai sei siti di catalogo: per questi ultimi **la ricerca rimane solo informativa** e la scritta «Prossimamente» persiste; non vengono ricavati link video né aggirati blocchi o DRM.
 
-## Film riproducibili: Frenky Cinema Libero (Beta 6)
+## Frenky Cinema Libero (Beta 7)
 
-Sorgente aggiunta nella Beta 6, separata dalle sei sorgenti di metadata.
-Contiene **12 cortometraggi interi** del progetto **Blender Open Movies** pubblicati sul server ufficiale **video.blender.org**, tra cui **Big Buck Bunny, Sintel, Tears of Steel, Spring, Elephants Dream, Agent 327, Coffee Run e Sprite Fright**. [Catalogo Blender Studio](https://studio.blender.org/films/).
+La Beta 6 conteneva collegamenti MP4 costruiti da UUID non verificati: per questo alcuni film, incluso Sintel, hanno restituito ERROR_CODE_IO_BAD_HTTP_STATUS (2004). La versione 7 elimina **tutti** gli URL MP4 e gli UUID ipotizzati dal codice.
 
-- Seleziona **Frenky Cinema Libero** dal menu delle sorgenti. I 12 film appaiono nella schermata iniziale.
-- Apri un film, premi **Riproduci film**: CloudStream usa direttamente l'MP4 ufficiale a 720p. La ricerca funziona per titolo, parola, anno e genere descrittivo.
-- I singoli collegamenti provengono dall'indice pubblico dei flussi del server Blender, verificabile su [FreetuxTV](https://database.freetuxtv.net/WebStream/index?WebStreamSearchForm%5BLanguage%5D=en&WebStreamSearchForm%5BStatus%5D=2&WebStreamSearchForm%5BType%5D=4). Anche un link elencato come attivo può in seguito diventare non disponibile o non essere raggiungibile dal tablet.
-- I film sono disponibili in lingua originale, **non sono garantiti audio o sottotitoli italiani**. Ogni film rimanda alla sua pagina sul server originale; la licenza specifica va rispettata e i titoli di coda non devono essere rimossi.
-- Il **Test Player** della v5 resta incluso. **Eurostream, CB01, GuardaSerie, Il Genio e gli altri siti restano di sola ricerca**: questa versione non ricava link video da tali siti e non aggira blocchi o DRM.
+La sorgente mantiene 12 titoli di opere Blender come catalogo potenziale. Quando premi Riproduci film, esegue una ricerca sull'API pubblica dell'istanza ufficiale PeerTube `video.blender.org`. Accetta solamente film dell'account `blender`, nel canale `Blender Open Movies`, con titolo compatibile e flussi HTTPS dichiarati dall'API. Supporta file MP4 e playlist M3U8 presenti nella risposta del server.
+
+**La presenza del titolo nella schermata non garantisce che la copia video sia presente sul server.** Se la ricerca dell'API non trova un film disponibile, CloudStream non riceve alcun link. Anche i link ufficiali ottenuti dall'API dovranno essere verificati sul tablet.
+
+La sorgente **Frenky - Test Player** già collaudata rimane intatta; Eurostream, CB01 e le altre fonti restano metadata-only, senza estrazione video.
 
 ## Installazione
 
@@ -42,7 +41,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 6 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 6** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 7 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 7** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
