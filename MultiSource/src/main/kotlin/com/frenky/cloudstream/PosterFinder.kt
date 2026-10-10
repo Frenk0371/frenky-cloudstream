@@ -55,6 +55,6 @@ object PosterFinder {
     fun fromSearchCard(anchor: Element, card: Element?): String? {
         val images = sequenceOf(anchor.selectFirst("img"), card?.selectFirst("img"),
             anchor.parent()?.selectFirst("img")).filterNotNull()
-        return images.mapNotNull { candidates(it).firstOrNull() }.firstOrNull()
+        return images.mapNotNull { image: Element -> candidates(image).firstOrNull() }.firstOrNull()
     }
 }
