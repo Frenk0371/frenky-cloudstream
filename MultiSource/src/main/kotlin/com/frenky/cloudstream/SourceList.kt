@@ -12,8 +12,6 @@ data class Source(
 
 object SourceList {
     val all = listOf(
-        Source("eurostream", "Eurostream", "https://eurostream.pics/", SearchMode.WORDPRESS, true),
-        Source("streamingcommunity", "StreamingCommunity", "https://streamingcommunityz.rip/"),
-        Source("guardaserie", "GuardaSerie", "https://guardaseriex.click/", SearchMode.DLE_GET, true)
+        Source("eurostream", "Eurostream", "https://eurostream.pics/", SearchMode.WORDPRESS, true)
     )
 }
