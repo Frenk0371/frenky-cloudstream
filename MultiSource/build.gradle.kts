@@ -1,7 +1,7 @@
-version = 32
+version = 33
 
 cloudstream {
-    description = "Improved Eurostream series poster extraction"
+    description = "Eurostream cover-only poster selection"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
