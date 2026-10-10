@@ -1,7 +1,7 @@
-version = 1
+version = 2
 
 cloudstream {
-    description = "Six configurable CloudStream placeholder providers; no video extraction"
+    description = "Title and metadata search for 4 public HTML catalogues; no video extraction"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
