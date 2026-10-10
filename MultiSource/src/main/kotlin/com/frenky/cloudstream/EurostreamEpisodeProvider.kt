@@ -209,17 +209,34 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
         val description = document.selectFirst("meta[property=og:description]")?.attr("content")
             ?: document.selectFirst("meta[name=description]")?.attr("content")
             ?: ""
-        // Prefer the series artwork, including relative and lazy-loaded URLs.
-        // Avoid placeholder images and leave the playback path unchanged.
-        val poster = sequenceOf(
-            document.selectFirst("meta[property=og:image]")?.absUrl("content"),
-            document.selectFirst("meta[name=twitter:image]")?.absUrl("content"),
-            document.selectFirst("meta[property=twitter:image]")?.absUrl("content"),
-            document.selectFirst("article img, .entry-content img, .post img, .poster img")?.absUrl("data-src"),
-            document.selectFirst("article img, .entry-content img, .post img, .poster img")?.absUrl("data-original"),
-            document.selectFirst("article img, .entry-content img, .post img, .poster img")?.absUrl("src")
-        ).filterNotNull().map { it.trim() }
-            .firstOrNull { publicHttps(it) && !it.contains("placeholder", ignoreCase = true) }
+        // Only use artwork explicitly marked as a poster/cover. Generic article
+        // images can be episode screenshots, advertisements or unrelated banners.
+        val posterSelectors = listOf(
+            "meta[property=og:image]" to "content",
+            "meta[name=twitter:image]" to "content",
+            "meta[property=twitter:image]" to "content",
+            "meta[itemprop=image]" to "content",
+            "link[rel=image_src]" to "href",
+            "img[itemprop=image]" to "data-src",
+            "img[itemprop=image]" to "src",
+            ".poster img" to "data-src",
+            ".poster img" to "data-original",
+            ".poster img" to "src",
+            ".cover img" to "data-src",
+            ".cover img" to "src",
+            ".thumbnail img" to "data-src",
+            ".thumbnail img" to "src"
+        )
+        val poster = posterSelectors.asSequence()
+            .mapNotNull { (selector, attribute) ->
+                document.selectFirst(selector)?.absUrl(attribute)?.trim()
+            }
+            .firstOrNull { candidate ->
+                publicHttps(candidate) &&
+                    !candidate.contains("placeholder", ignoreCase = true) &&
+                    !candidate.contains("blank.gif", ignoreCase = true) &&
+                    !candidate.contains("data:image", ignoreCase = true)
+            }
         val listings = parseEpisodes(document)
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
