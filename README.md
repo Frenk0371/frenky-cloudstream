@@ -1,3 +1,15 @@
+# Frenky CloudStream — Beta 19 sperimentale
+
+## Beta 19: browser manuale per pagine intermedie
+
+- Quando Eurostream ha server elencati ma non trova alcun flusso diretto, e uno dei link è un intermediario (es. Clicka/SafeGo), propone una finestra WebView **all'interno dell'app**.
+- Puoi attendere il conto alla rovescia e chiudere **tu** l'eventuale pubblicità, come in Veezie. La finestra non salta le attese, non invia form e non aggira i controlli di accesso.
+- Se durante la navigazione compare un indirizzo HTTPS chiaramente identificabile come MP4, HLS o DASH, il pulsante **Usa il video rilevato** si abilita. Premi solo dopo aver aperto l'episodio: un URL rilevato potrebbe appartenere a un filmato pubblicitario.
+- Con la tua conferma l'URL viene passato al lettore CloudStream, preservando il Referer e, ove disponibile, il cookie della sessione WebView. Non vengono raccolti cookie in un server esterno.
+- La WebView disabilita accesso ai file del dispositivo, URL non HTTPS, contenuti misti e aperture automatiche di popup. Non utilizza interfacce JavaScript native.
+- La compilazione automatica può confermare il codice, **non che DeltaBit fornisca un video compatibile**. La prova richiede una navigazione reale sul dispositivo.
+- Se non appare alcun URL MP4/M3U8/MPD, la funzione non può avviare il filmato e mostra ancora «Nessun link trovato» al termine.
+
 # Frenky CloudStream — Beta 18
 
 ## Beta 18: compatibilità HTML5 e diagnostica HTTP
