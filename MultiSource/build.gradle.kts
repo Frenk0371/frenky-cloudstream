@@ -1,7 +1,7 @@
-version = 23
+version = 24
 
 cloudstream {
-    description = "Refresh browser rendering for delayed CAPTCHA display"
+    description = "Larger embedded browser and WebView rendering refresh"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
