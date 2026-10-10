@@ -140,8 +140,7 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
                 val title = options.maxByOrNull { titleScore(query, it) } ?: continue
                 val score = titleScore(query, title)
                 if (score < 60) continue
-                val poster = img?.absUrl("data-src")?.takeIf { it.startsWith("https://") }
-                    ?: img?.absUrl("src")?.takeIf { it.startsWith("https://") }
+                val poster = PosterFinder.fromSearchCard(anchor, card)
                 val item = CatalogueHit(title, url, poster, score)
                 if (hits[url] == null || hits[url]!!.score < score) hits[url] = item
             }
