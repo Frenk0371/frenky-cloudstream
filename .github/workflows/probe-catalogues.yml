@@ -1,0 +1,31 @@
+name: Probe catalogue HTML metadata
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/probe_catalogues.py'
+      - '.github/workflows/probe-catalogues.yml'
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect public catalogue metadata
+        run: python tools/probe_catalogues.py
+      - name: Commit diagnostic summary
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/catalogue_probe.json
+          if ! git diff --cached --quiet; then
+            git commit -m "test: summarize public catalogue HTML"
+            git push
+          fi
