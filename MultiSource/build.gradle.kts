@@ -1,7 +1,7 @@
-version = 20
+version = 21
 
 cloudstream {
-    description = "Improved Eurostream search matching and HTTP diagnostics"
+    description = "Improved embedded player layout and keyboard handling"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
