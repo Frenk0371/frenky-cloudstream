@@ -204,8 +204,11 @@ internal object ManualMediaBrowser {
                 // Expand the Android dialog to the tablet's available display.
                 // Keep the WebView's viewport, navigation and media interception intact.
                 dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-                dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                // Keep the dialog centered and give its content a measured height.
+                // The web page itself and media detection remain untouched.
+                dialog.window?.setGravity(android.view.Gravity.CENTER)
                 dialog.window?.decorView?.setPadding(0, 0, 0, 0)
+                layout.minimumHeight = (activity.resources.displayMetrics.heightPixels * 0.82f).toInt()
                 dialog.window?.setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
