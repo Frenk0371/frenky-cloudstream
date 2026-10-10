@@ -1,7 +1,7 @@
-version = 19
+version = 20
 
 cloudstream {
-    description = "Experimental manual player browser, HTML5 recognition and HTTP diagnostics"
+    description = "Improved Eurostream search matching and HTTP diagnostics"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
