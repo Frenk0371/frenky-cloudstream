@@ -1,6 +1,21 @@
-# Frenky CloudStream — Beta 11
+# Frenky CloudStream — Beta 12
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
+
+## Beta 12: stagioni e diagnostica
+
+- Il catalogo Eurostream conserva ora anche gli episodi privi di un link
+  riconosciuto, evitando la sparizione silenziosa di intere stagioni.
+- Cerca il blocco HTML con più stagioni e gestisce intestazioni suddivise
+  tra elementi. Le quattro stagioni di The Sentinel richiedono un collaudo
+  sul tablet: la schermata originale ne mostrava solo una.
+- La scheda riporta il numero di puntate, stagioni e puntate con link elencati.
+  Quelle senza server vengono contrassegnate.
+- I fallimenti degli estrattori sono registrati in Android Logcat con il tag
+  FrenkyCloudStream; non vengono registrati gli URL completi.
+- I collegamenti che richiedono CAPTCHA, redirect protetti o accesso interattivo
+  possono ancora mostrare "Nessun link trovato". Non si aggirano verifiche,
+  DRM o controlli di accesso. Nessuna modifica ai provider demo o Blender.
 
 ## Stato delle fonti (10 ottobre 2026)
 
@@ -13,7 +28,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 11 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 12 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -70,7 +85,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 11 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 11** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 12 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 12** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 

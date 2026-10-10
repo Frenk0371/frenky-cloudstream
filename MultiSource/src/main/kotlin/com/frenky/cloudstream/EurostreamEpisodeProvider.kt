@@ -1,5 +1,6 @@
 package com.frenky.cloudstream
 
+import android.util.Log
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
@@ -107,9 +108,17 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
      * last episode of the season.
      */
     private fun parseEpisodes(document: org.jsoup.nodes.Document): List<EpisodeListing> {
-        val root: Element = document.selectFirst(
-            ".entry-content, .post-content, .post-entry, article .content, article"
-        ) ?: document.body()
+        val candidates = document.select(
+            ".entry-content, .post-content, .post-entry, article .content, article, main"
+        )
+        // A nested content fragment can include only season 1. Prefer the
+        // smallest candidate with the highest number of season headings.
+        val root: Element = candidates
+            .sortedWith(compareByDescending<Element> {
+                seasonRegex.findAll(it.text()).map { m -> m.groupValues[1] }
+                    .distinct().count()
+            }.thenBy { it.text().length })
+            .firstOrNull() ?: document.body()
         val found = LinkedHashMap<EpisodeId, EpisodeListing>()
         var seasonHint = 1
         var active: EpisodeId? = null
@@ -117,6 +126,15 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
         fun walk(node: Node) {
             if (node is Element && node.normalName() in setOf("script", "style", "noscript", "nav", "footer"))
                 return
+            if (node is Element && node.normalName() in
+                setOf("h2", "h3", "h4", "h5", "summary", "button") &&
+                seasonRegex.containsMatchIn(node.text())) {
+                // Detect headings even when the number is in a separate span.
+                seasonRegex.findAll(node.text()).lastOrNull()?.let {
+                    seasonHint = it.groupValues[1].toIntOrNull() ?: seasonHint
+                    active = null
+                }
+            }
             if (node is TextNode) {
                 val value = node.text()
                 seasonRegex.findAll(value).lastOrNull()?.let {
@@ -128,6 +146,7 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                     val episode = it.groupValues[2].toIntOrNull() ?: 0
                     if (season in 1..99 && episode in 1..999) {
                         active = EpisodeId(season, episode)
+                        found.getOrPut(active!!) { EpisodeListing(active!!) }
                     }
                 }
                 // Some posts label a season once and write "Episodio 01" on
@@ -135,8 +154,10 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 if (!episodeRegex.containsMatchIn(value)) {
                     simpleEpisodeRegex.findAll(value).lastOrNull()?.let {
                         val episode = it.groupValues[1].toIntOrNull() ?: 0
-                        if (episode in 1..999 && seasonHint in 1..99)
+                        if (episode in 1..999 && seasonHint in 1..99) {
                             active = EpisodeId(seasonHint, episode)
+                            found.getOrPut(active!!) { EpisodeListing(active!!) }
+                        }
                     }
                 }
             } else if (node is Element && node.normalName() == "a") {
@@ -159,8 +180,9 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
         }
 
         walk(root)
+        // Keep indexed episodes with no recognized server: otherwise an entire
+        // season may disappear simply because an external host changed.
         return found.values
-            .filter { it.videoPages.isNotEmpty() }
             .sortedWith(compareBy<EpisodeListing> { it.id.season }.thenBy { it.id.number })
     }
 
@@ -182,6 +204,8 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
         val poster = document.selectFirst("meta[property=og:image]")?.attr("content")
             ?.takeIf { publicHttps(it) }
         val listings = parseEpisodes(document)
+        val seasonCount = listings.map { it.id.season }.distinct().size
+        val linkedCount = listings.count { it.videoPages.isNotEmpty() }
         val episodes = listings.map { listing ->
             val links = JSONArray()
             listing.videoPages.values.forEach { link ->
@@ -192,7 +216,8 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 .put("players", links)
                 .toString()
             newEpisode(data, initializer = {
-                name = "Episodio " + listing.id.number
+                name = "Episodio " + listing.id.number +
+                    if (listing.videoPages.isEmpty()) " (nessun server individuato)" else ""
                 season = listing.id.season
                 episode = listing.id.number
             }, fix = false)
@@ -200,9 +225,12 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
             posterUrl = poster
             plot = description.take(800) + if (episodes.isEmpty()) {
-                "\n\nNessun episodio ricavabile da questa pagina: controlla il sito."
+                "\n\nNessun episodio individuato nella pagina pubblica."
             } else {
-                "\n\n" + episodes.size + " episodi elencati. La riproduzione dipende dai server esterni disponibili."
+                "\n\nCatalogo: " + episodes.size + " episodi in " + seasonCount +
+                    " stagioni; " + linkedCount + " episodi con server elencati." +
+                    " Alcuni server richiedono verifiche interattive o non sono" +
+                    " compatibili con CloudStream. L'elenco non garantisce la riproduzione."
             }
         }
     }
@@ -244,16 +272,28 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 continue
             }
             try {
+                val before = emitted
                 loadExtractor(url, origin, subtitleCallback) { video ->
                     if (publicHttps(video.url)) {
                         callback(video)
                         emitted++
                     }
                 }
-            } catch (_: Exception) {
-                // Try the next mirror; do not turn a failed extraction into
-                // a fake stream that the player cannot open.
+                if (emitted == before) {
+                    val host = runCatching { URI(url).host }.getOrNull().orEmpty()
+                    Log.i("FrenkyCloudStream", "Eurostream: no media resolved for " +
+                        host + " (unsupported player, redirect or interactive check)")
+                }
+            } catch (error: Exception) {
+                // Log only host and exception name, never URLs or session tokens.
+                val host = runCatching { URI(url).host }.getOrNull().orEmpty()
+                Log.w("FrenkyCloudStream", "Eurostream: extractor failure for " +
+                    host + " (" + error.javaClass.simpleName + ")")
             }
+        }
+        if (emitted == 0) {
+            Log.i("FrenkyCloudStream", "Eurostream: no playable media from " +
+                players.length() + " listed servers")
         }
         return emitted > 0
     }

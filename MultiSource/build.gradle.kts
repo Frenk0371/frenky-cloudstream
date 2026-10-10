@@ -1,7 +1,7 @@
-version = 11
+version = 12
 
 cloudstream {
-    description = "Eurostream native episode indexing and standard CloudStream player extraction"
+    description = "Eurostream multi-season catalogue and external server diagnostics"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
