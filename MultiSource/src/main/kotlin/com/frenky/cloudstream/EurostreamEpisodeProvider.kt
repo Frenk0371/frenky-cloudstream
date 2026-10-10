@@ -191,11 +191,11 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 .put("origin", url)
                 .put("players", links)
                 .toString()
-            newEpisode(data, fix = false) {
+            newEpisode(data, initializer = {
                 name = "Episodio " + listing.id.number
                 season = listing.id.season
                 episode = listing.id.number
-            }
+            }, fix = false)
         }
         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
             posterUrl = poster
