@@ -1,7 +1,7 @@
-version = 36
+version = 37
 
 cloudstream {
-    description = "CB01 standard player links and poster sync"
+    description = "CB01 legacy links fix; standard player support"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
