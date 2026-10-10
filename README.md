@@ -1,4 +1,15 @@
-# Frenky CloudStream — Beta 16
+# Frenky CloudStream — Beta 17
+
+## Beta 17: lettori HTML5 pubblici e diagnosi
+
+- Dopo un normale redirect HTTP riconosce direttamente le destinazioni MP4, HLS e DASH.
+- Riconosce ulteriori sorgenti pubblicamente dichiarate: attributi `data-src` dei tag video, metadati video e URL non offuscati nelle configurazioni del lettore.
+- Se la pagina pubblica non contiene un video diretto, esamina fino a due iframe HTML standard, senza eseguire JavaScript o seguire catene di iframe.
+- Usa l'indirizzo della pagina del lettore incorporato come Referer quando serve a una sorgente HTML5 ordinaria.
+- I log distinguono gli intermediari, le verifiche interattive, le pagine non raggiungibili e l'assenza di video HTML5.
+- **DeltaBit/Clicka/SafeGo e Turbovid:** il log precedente indicava nessun flusso disponibile. Questo aggiornamento non garantisce che l'episodio si avvii: senza un URL multimediale pubblicamente accessibile, CloudStream mostrerà ancora «Nessun link trovato». Non aggira CAPTCHA, DRM, login o controlli di accesso.
+
+
 
 ## Beta 16: diagnosi The Sentinel (log Android del 10 ottobre)
 
