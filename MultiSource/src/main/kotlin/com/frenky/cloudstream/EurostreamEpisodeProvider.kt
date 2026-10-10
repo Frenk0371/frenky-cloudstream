@@ -207,6 +207,29 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
         val episodes = listings.map { listing ->
+            val servers = listing.videoPages.values.map { it.name.trim() }
+                .filter { it.isNotBlank() }.distinct().take(6)
+            val intermediary = listing.videoPages.values.any { page ->
+                val host = runCatching { URI(page.url).host?.lowercase(Locale.ROOT) }
+                    .getOrNull().orEmpty()
+                host == "clicka.cc" || host.endsWith(".clicka.cc") ||
+                    host == "safego.cc"
+            }
+            val episodeDetails = if (listing.videoPages.isEmpty()) {
+                "Nessun server video riconosciuto. Puoi verificare la pagina " +
+                    "originale premendo l'icona del globo nella scheda della serie."
+            } else {
+                "Server elencati: " + servers.joinToString(", ") + "." +
+                    if (intermediary) {
+                        " Alcuni link passano da pagine intermedie o verifiche " +
+                            "interattive: CloudStream potrebbe non poterli riprodurre." +
+                            " Usa il globo nella scheda della serie per aprire il sito " +
+                            "nel browser e selezionare questa puntata."
+                    } else {
+                        " CloudStream prova i lettori supportati. Se non trova " +
+                            "un video, usa il globo nella scheda per aprire il sito."
+                    }
+            }
             val links = JSONArray()
             listing.videoPages.values.forEach { link ->
                 links.put(JSONObject().put("name", link.name).put("url", link.url))
@@ -220,6 +243,7 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                     if (listing.videoPages.isEmpty()) " (nessun server individuato)" else ""
                 season = listing.id.season
                 episode = listing.id.number
+                description = episodeDetails
             }, fix = false)
         }
         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
@@ -230,7 +254,9 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 "\n\nCatalogo: " + episodes.size + " episodi in " + seasonCount +
                     " stagioni; " + linkedCount + " episodi con server elencati." +
                     " Alcuni server richiedono verifiche interattive o non sono" +
-                    " compatibili con CloudStream. L'elenco non garantisce la riproduzione."
+                    " compatibili con CloudStream. L'elenco non garantisce la riproduzione." +
+                    " Se il lettore mostra Nessun link trovato, tocca il globo in " +
+                    "alto a destra per aprire la pagina della serie nel browser."
             }
         }
     }

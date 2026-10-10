@@ -1,7 +1,7 @@
-version = 12
+version = 13
 
 cloudstream {
-    description = "Eurostream multi-season catalogue and external server diagnostics"
+    description = "Eurostream episode-server details and browser fallback instructions"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")

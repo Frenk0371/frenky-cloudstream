@@ -1,6 +1,23 @@
-# Frenky CloudStream — Beta 12
+# Frenky CloudStream — Beta 13
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
+
+## Beta 13: diagnosi per puntata e apertura nel browser
+
+- Ogni episodio Eurostream mostra, dove l'interfaccia CloudStream espone la
+  descrizione, i nomi dei server elencati nella pagina originale.
+- Per collegamenti intermedi come `clicka.cc`, segnala che la riproduzione
+  interna puo non essere disponibile senza completare verifiche nel browser.
+- Il pulsante a forma di **globo in alto a destra**, gia presente nella schermata
+  dettagli di CloudStream, apre la pagina originale della **serie**, dalla quale
+  si sceglie manualmente stagione, episodio e server. **Non avvia automaticamente
+  quella puntata nel player CloudStream.**
+- L'estensione continua a tentare soltanto estrattori supportati e flussi HTTPS
+  diretti; non inventa link multimediali, non aggira CAPTCHA/DRM e non apre
+  automaticamente pagine pubblicitarie.
+- Il test delle quattro stagioni e dei 65 episodi di *The Sentinel* e stato
+  confermato sul tablet nella Beta 12; la riproduzione interna resta da testare
+  soltanto con server compatibili e autorizzati.
 
 ## Beta 12: stagioni e diagnostica
 
@@ -28,7 +45,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 12 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 13 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -85,7 +102,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 12 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 12** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 13 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 13** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
