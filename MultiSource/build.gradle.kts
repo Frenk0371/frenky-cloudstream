@@ -1,7 +1,7 @@
-version = 6
+version = 7
 
 cloudstream {
-    description = "12 official Blender open movies with native playback + catalog metadata search"
+    description = "Blender Open Movies via official PeerTube API + metadata-only catalog search"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
