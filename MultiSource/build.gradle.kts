@@ -1,7 +1,7 @@
-version = 16
+version = 17
 
 cloudstream {
-    description = "Delta Bit name variants, public redirects and diagnostic logs"
+    description = "Public HTML5 players, standard redirects and diagnostic logs"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
