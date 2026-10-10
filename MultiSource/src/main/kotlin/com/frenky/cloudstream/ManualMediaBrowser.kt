@@ -169,7 +169,20 @@ internal object ManualMediaBrowser {
                 // The site may have its own small content panel; this changes only
                 // the Android container, not the website viewport or media requests.
                 browser.setBackgroundColor(android.graphics.Color.WHITE)
-                browser.setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
+                // A manual compositor nudge without navigation or CAPTCHA reload.
+                val refreshButton = Button(activity).apply {
+                    text = "Aggiorna visualizzazione"
+                    setOnClickListener {
+                        browser.visibility = android.view.View.INVISIBLE
+                        browser.post {
+                            browser.visibility = android.view.View.VISIBLE
+                            browser.requestLayout()
+                            browser.invalidate()
+                        }
+                    }
+                }
+                layout.addView(refreshButton, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(status, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(browser, LinearLayout.LayoutParams(
