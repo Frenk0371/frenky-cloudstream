@@ -1,4 +1,4 @@
-# Frenky CloudStream — Beta 7
+# Frenky CloudStream — Beta 8
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
@@ -13,7 +13,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 7 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 8 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -21,13 +21,22 @@ La voce **Frenky - Test Player** contiene ora tre clip di prova indipendenti: **
 
 L'esperimento è volutamente separato dai sei siti di catalogo: per questi ultimi **la ricerca rimane solo informativa** e la scritta «Prossimamente» persiste; non vengono ricavati link video né aggirati blocchi o DRM.
 
-## Frenky Cinema Libero (Beta 7)
+## Frenky Cinema Libero (Beta 8)
 
-La Beta 6 conteneva collegamenti MP4 costruiti da UUID non verificati: per questo alcuni film, incluso Sintel, hanno restituito ERROR_CODE_IO_BAD_HTTP_STATUS (2004). La versione 7 elimina **tutti** gli URL MP4 e gli UUID ipotizzati dal codice.
+La Beta 6 conteneva collegamenti MP4 costruiti da UUID non verificati: per questo alcuni film, incluso Sintel, hanno restituito ERROR_CODE_IO_BAD_HTTP_STATUS (2004). La versione 7 ha eliminato **tutti** gli URL MP4 e gli UUID ipotizzati dal codice.
 
-La sorgente mantiene 12 titoli di opere Blender come catalogo potenziale. Quando premi Riproduci film, esegue una ricerca sull'API pubblica dell'istanza ufficiale PeerTube `video.blender.org`. Accetta solamente film dell'account `blender`, nel canale `Blender Open Movies`, con titolo compatibile e flussi HTTPS dichiarati dall'API. Supporta file MP4 e playlist M3U8 presenti nella risposta del server.
+La sorgente comprende 14 titoli di opere Blender come catalogo potenziale. Quando premi Riproduci film, esegue una ricerca sull'API pubblica dell'istanza ufficiale PeerTube `video.blender.org`. Accetta solamente film dell'account `blender`, nel canale `Blender Open Movies`, con titolo compatibile e flussi HTTPS dichiarati dall'API. Supporta file MP4 e playlist M3U8 presenti nella risposta del server.
 
 **La presenza del titolo nella schermata non garantisce che la copia video sia presente sul server.** Se la ricerca dell'API non trova un film disponibile, CloudStream non riceve alcun link. Anche i link ufficiali ottenuti dall'API dovranno essere verificati sul tablet.
+
+### Miglioramenti Beta 8
+
+- **Locandine e durata** ottenute dalle risposte dell'API pubblica di Blender quando presenti. Se il server non risponde, il titolo resta visualizzato senza poster.
+- **Ricerca italiana** per titolo, anno e parole descrittive; la schermata iniziale conserva l'elenco dei film.
+- **Qualità etichettata** (es. 720p MP4, 1080p MP4, Auto HLS) sulla base delle risoluzioni dichiarate dall'API, se disponibili. La selezione è gestita dai controlli di CloudStream.
+- Due film aggiunti alla lista potenziale: **Charge** (2022) e **Wing It!** (2023), confermati nel catalogo ufficiale [Blender Studio](https://studio.blender.org/films/). Non è garantito che siano presenti anche su video.blender.org.
+- **Motore di playback della v7 conservato**: nessuna modifica ai criteri che selezionano film e flussi. I collegamenti vengono sempre richiesti al server ufficiale prima di riprodurre.
+- **Cache temporanea** per le informazioni grafiche; nessun account, API a pagamento o modifica alle altre estensioni.
 
 La sorgente **Frenky - Test Player** già collaudata rimane intatta; Eurostream, CB01 e le altre fonti restano metadata-only, senza estrazione video.
 
@@ -41,7 +50,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 7 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 7** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 8 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 8** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
