@@ -1,5 +1,9 @@
 name: Build CloudStream extension
 
+concurrency:
+  group: frenky-cloudstream-build
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
