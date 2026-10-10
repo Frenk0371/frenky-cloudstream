@@ -462,6 +462,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             Log.i("FrenkyCloudStream", "Eurostream: trying server " +
                 label.replace(Regex("""[\r\n\t]"""), " ").take(40) + " at " + host)
             val directFormat = mediaFormat(url)
+            Log.i("FrenkyCloudStream", "Eurostream diagnostic: directMedia=" + (directFormat != null) + " host=" + host)
             if (directFormat != null) {
                 callback(newExtractorLink(
                     source = name,
@@ -482,6 +483,9 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             // A normal HTTP redirect may lead straight to MP4/HLS/DASH.
             // Check this before passing the destination to page extractors.
             val redirectedFormat = mediaFormat(destination)
+            Log.i("FrenkyCloudStream", "Eurostream diagnostic: redirectChanged=" + (destination != url) +
+                " media=" + (redirectedFormat != null) + " destinationHost=" +
+                (runCatching { URI(destination).host }.getOrNull() ?: "unknown"))
             if (redirectedFormat != null && seen.add(destination)) {
                 callback(newExtractorLink(
                     source = name,
@@ -546,12 +550,15 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             }
         }
         if (emitted == 0) {
+            Log.i("FrenkyCloudStream", "Eurostream diagnostic: standardAndHtml5Extractors=empty")
             // The user can perform the website's ordinary countdown/ad interactions.
             // This does not skip a challenge or fabricate a stream URL.
             val intermediary = (0 until minOf(players.length(), 10))
                 .mapNotNull { players.optJSONObject(it)?.optString("url") }
                 .firstOrNull { publicHttps(it) && isIntermediary(it) }
             val activity = browserActivity.get()
+            Log.i("FrenkyCloudStream", "Eurostream diagnostic: intermediaryPresent=" + (intermediary != null) +
+                " activityAvailable=" + (activity != null && !activity.isFinishing))
             if (intermediary != null && activity != null && !activity.isFinishing) {
                 Log.i("FrenkyCloudStream", "Eurostream: offering manual public browser")
                 try {
