@@ -209,60 +209,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
         val description = document.selectFirst("meta[property=og:description]")?.attr("content")
             ?: document.selectFirst("meta[name=description]")?.attr("content")
             ?: ""
-        // Only use artwork explicitly marked as a poster/cover. Generic article
-        // images can be episode screenshots, advertisements or unrelated banners.
-        val posterSelectors = listOf(
-            "meta[property=og:image]" to "content",
-            "meta[name=twitter:image]" to "content",
-            "meta[property=twitter:image]" to "content",
-            "meta[itemprop=image]" to "content",
-            "link[rel=image_src]" to "href",
-            "img[itemprop=image]" to "data-src",
-            "img[itemprop=image]" to "src",
-            ".poster img" to "data-src",
-            ".poster img" to "data-original",
-            ".poster img" to "src",
-            ".cover img" to "data-src",
-            ".cover img" to "src",
-            ".thumbnail img" to "data-src",
-            ".thumbnail img" to "src"
-        )
-        val poster = posterSelectors.asSequence()
-            .mapNotNull { (selector, attribute) ->
-                document.selectFirst(selector)?.absUrl(attribute)?.trim()
-            }
-            .firstOrNull { candidate ->
-                publicHttps(candidate) &&
-                    !candidate.contains("placeholder", ignoreCase = true) &&
-                    !candidate.contains("blank.gif", ignoreCase = true) &&
-                    !candidate.contains("data:image", ignoreCase = true)
-            }
-        // Eurostream sometimes places its series artwork in an ordinary article
-        // <img alt="Series title streaming"> rather than in og:image or .poster.
-        // Select only images whose alt matches this page's own title, avoiding
-        // sidebar thumbnails and unrelated advertisements.
-        val artwork = poster ?: document.select("article img[alt], .entry-content img[alt], .post-content img[alt], main img[alt]")
-            .asSequence()
-            .filter { image ->
-                val label = image.attr("alt").lowercase(Locale.ROOT)
-                    .replace(Regex("""\b(streaming|serie tv|ita|subita)\b"""), "")
-                    .replace(Regex("""[^\p{L}\p{N}]+"""), " ").trim()
-                val pageTitle = title.lowercase(Locale.ROOT)
-                    .replace(Regex("""\b(streaming|serie tv|ita|subita)\b"""), "")
-                    .replace(Regex("""[^\p{L}\p{N}]+"""), " ").trim()
-                label.isNotBlank() && pageTitle.isNotBlank() &&
-                    (label == pageTitle || label == pageTitle.removePrefix("the ") ||
-                        pageTitle == label.removePrefix("the "))
-            }
-            .flatMap { image ->
-                sequenceOf("data-src", "data-original", "data-lazy-src", "src")
-                    .map { image.absUrl(it).trim() }
-            }
-            .firstOrNull { imageUrl ->
-                publicHttps(imageUrl) &&
-                    !imageUrl.contains("placeholder", ignoreCase = true) &&
-                    !imageUrl.contains("blank.gif", ignoreCase = true)
-            }
+        val artwork = PosterFinder.fromDocument(document, title)
         val listings = parseEpisodes(document)
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
