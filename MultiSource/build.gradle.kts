@@ -1,7 +1,7 @@
-version = 26
+version = 27
 
 cloudstream {
-    description = "Rollback zoom changes to restore v24 playback"
+    description = "Software WebView rendering test for CAPTCHA visibility"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
