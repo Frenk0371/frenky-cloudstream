@@ -237,6 +237,32 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
                     !candidate.contains("blank.gif", ignoreCase = true) &&
                     !candidate.contains("data:image", ignoreCase = true)
             }
+        // Eurostream sometimes places its series artwork in an ordinary article
+        // <img alt="Series title streaming"> rather than in og:image or .poster.
+        // Select only images whose alt matches this page's own title, avoiding
+        // sidebar thumbnails and unrelated advertisements.
+        val artwork = poster ?: document.select("article img[alt], .entry-content img[alt], .post-content img[alt], main img[alt]")
+            .asSequence()
+            .filter { image ->
+                val label = image.attr("alt").lowercase(Locale.ROOT)
+                    .replace(Regex("""\\b(streaming|serie tv|ita|subita)\\b"""), "")
+                    .replace(Regex("""[^\\p{L}\\p{N}]+"""), " ").trim()
+                val pageTitle = title.lowercase(Locale.ROOT)
+                    .replace(Regex("""\\b(streaming|serie tv|ita|subita)\\b"""), "")
+                    .replace(Regex("""[^\\p{L}\\p{N}]+"""), " ").trim()
+                label.isNotBlank() && pageTitle.isNotBlank() &&
+                    (label == pageTitle || label == pageTitle.removePrefix("the ") ||
+                        pageTitle == label.removePrefix("the "))
+            }
+            .flatMap { image ->
+                sequenceOf("data-src", "data-original", "data-lazy-src", "src")
+                    .map { image.absUrl(it).trim() }
+            }
+            .firstOrNull { imageUrl ->
+                publicHttps(imageUrl) &&
+                    !imageUrl.contains("placeholder", ignoreCase = true) &&
+                    !imageUrl.contains("blank.gif", ignoreCase = true)
+            }
         val listings = parseEpisodes(document)
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
@@ -281,7 +307,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             }, fix = false)
         }
         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-            posterUrl = poster
+            posterUrl = artwork
             plot = description.take(800) + if (episodes.isEmpty()) {
                 "\n\nNessun episodio individuato nella pagina pubblica."
             } else {
