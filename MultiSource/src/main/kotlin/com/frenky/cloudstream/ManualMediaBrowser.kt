@@ -63,11 +63,11 @@ internal object ManualMediaBrowser {
                     setPadding(12, 8, 12, 8)
                 }
                 val status = TextView(activity).apply {
-                    text = "Chiudi manualmente l'eventuale pubblicità e avvia il video. Nessun collegamento rilevato."
+                    text = "Completa gli eventuali controlli del sito e premi Play. In attesa del video…"
                     setPadding(8, 8, 8, 8)
                 }
                 val accept = Button(activity).apply {
-                    text = "Usa il video rilevato"
+                    text = "Riproduci in CloudStream"
                     isEnabled = false
                 }
                 val browser = WebView(activity).apply {
@@ -98,6 +98,13 @@ internal object ManualMediaBrowser {
                     false
                 }
 
+                val dismissKeyboard = {
+                    val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE)
+                        as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(browser.windowToken, 0)
+                    browser.clearFocus()
+                }
+
                 var captured: SelectedMedia? = null
                 val dialog = AlertDialog.Builder(activity)
                     .setTitle("Player nel browser (sperimentale)")
@@ -106,6 +113,7 @@ internal object ManualMediaBrowser {
                     .create()
 
                 fun finish(selection: SelectedMedia?) {
+                    dismissKeyboard()
                     if (continuation.isActive) continuation.resume(selection)
                     dialog.dismiss()
                 }
@@ -140,20 +148,23 @@ internal object ManualMediaBrowser {
                                     (runCatching { URI(target).host }.getOrNull() ?: "server") +
                                     ". Conferma soltanto dopo aver aperto l'episodio."
                                 accept.isEnabled = true
+                                dismissKeyboard()
                             }
                         }
                         return null // Let the browser perform the actual request.
                     }
                 }
+                status.textSize = 13f
                 layout.addView(status, LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-                layout.addView(accept, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(browser, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+                layout.addView(accept, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 
                 accept.setOnClickListener { captured?.let(::finish) }
                 dialog.setOnDismissListener {
+                    dismissKeyboard()
                     browser.stopLoading()
                     browser.loadUrl("about:blank")
                     browser.destroy()
