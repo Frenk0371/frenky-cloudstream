@@ -4,6 +4,13 @@ on:
   schedule:
     - cron: '15 5 * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/domains.json'
+      - 'tools/**'
+      - 'tests/**'
+      - '.github/workflows/check-domains.yml'
 
 permissions:
   contents: write
