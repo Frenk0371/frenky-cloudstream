@@ -1,3 +1,13 @@
+# Frenky CloudStream — Beta 18
+
+## Beta 18: compatibilità HTML5 e diagnostica HTTP
+
+- Supporto agli attributi HTML5 standard `src`, `data-src` e `data-file` per i video pubblicamente accessibili.
+- Ispezione limitata degli iframe pubblici con `src` o `data-src` per player che usano caricamento differito.
+- Il log ora indica il codice HTTP delle pagine non disponibili (per esempio 403 o 404), senza scambiarle per collegamenti video.
+- Rimangono invariati catalogo delle serie, struttura delle stagioni e test del player già funzionanti.
+- **Attenzione:** DeltaBit e Turbovid su *The Sentinel* non sono stati dimostrati riproducibili nella Beta 18. Il ramo `builds` viene aggiornato soltanto dopo compilazione riuscita. Non vengono aggirati controlli interattivi, DRM o accessi protetti.
+
 # Frenky CloudStream — Beta 17
 
 ## Beta 17: lettori HTML5 pubblici e diagnosi
