@@ -5,15 +5,22 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.newExtractorLink
+import org.json.JSONObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.URI
+import java.net.URL
+import java.net.HttpURLConnection
+import java.net.URLEncoder
 import java.text.Normalizer
 import java.util.Locale
 
 /**
  * Curated, freely shareable open movies from the official Blender video server.
  *
- * Unlike the metadata-only HTML catalogues this provider exposes authorized,
- * directly playable MP4 files, not embeds or extracted links from unrelated sites.
- * It doesn't bypass DRM, logins or access controls.
+ * Media URLs are discovered at playback time via Blender's official PeerTube API.
+ * The catalogue lists potential titles; availability depends on the publisher.
+ * No unrelated site, credentials, DRM or access controls are involved.
  */
 class FreeCinemaProvider : MainAPI() {
     override var mainUrl = "https://video.blender.org"
@@ -22,82 +29,27 @@ class FreeCinemaProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.Movie)
     override val hasMainPage = true
 
+    // A curated list of names only; never claim any static video URL exists.
     private data class Film(
-        val title: String,
-        val year: Int,
-        val videoId: String,
-        val streamUrl: String,
-        val description: String,
-        val tags: String = ""
+        val title: String, val year: Int, val description: String, val tags: String = ""
     ) {
-        val pageUrl: String get() = "https://video.blender.org/w/$videoId"
+        val pageUrl: String get() = "https://video.blender.org/search?search=" +
+            URLEncoder.encode(title, "UTF-8")
     }
 
-    /**
-     * MP4 media URLs from video.blender.org, as published in the public
-     * Blender Open Movies directory. Only the official video.blender.org host.
-     */
     private val films = listOf(
-        Film("Big Buck Bunny", 2008,
-            "bf1f3fb5-b119-4f9f-9930-8e20e892b898",
-            "https://video.blender.org/static/webseed/bf1f3fb5-b119-4f9f-9930-8e20e892b898-720.mp4",
-            "Un coniglio gigante, gentile ma determinato, si ribella agli scherzi di tre animali del bosco.",
-            "animazione commedia coniglio"),
-        Film("Sintel", 2010,
-            "0eb052d0-fd51-43e6-aa33-ecdbf77a5d40",
-            "https://video.blender.org/static/webseed/0eb052d0-fd51-43e6-aa33-ecdbf77a5d40-720.mp4",
-            "Una giovane guerriera attraversa un mondo fantastico alla ricerca del suo amico drago.",
-            "animazione fantasy avventura drago"),
-        Film("Tears of Steel", 2012,
-            "8533ea43-4271-4a57-9694-e9d0b35e1aa1",
-            "https://video.blender.org/static/webseed/8533ea43-4271-4a57-9694-e9d0b35e1aa1-720.mp4",
-            "Ad Amsterdam, un gruppo tenta di cambiare un evento del passato per fermare un futuro dominato dai robot.",
-            "fantascienza sci-fi robot vfx"),
-        Film("Spring", 2019,
-            "3d95fb3d-c866-42c8-9db1-fe82f48ccb95",
-            "https://video.blender.org/static/webseed/3d95fb3d-c866-42c8-9db1-fe82f48ccb95-720.mp4",
-            "Una giovane pastora e il suo cane incontrano spiriti antichi in un viaggio attraverso le stagioni.",
-            "animazione fantasy primavera"),
-        Film("Elephants Dream", 2006,
-            "cccc3e60-0291-4ecc-aa56-39b2e2c7d0d5",
-            "https://video.blender.org/static/webseed/cccc3e60-0291-4ecc-aa56-39b2e2c7d0d5-720.mp4",
-            "Due personaggi esplorano un mondo meccanico surreale nel primo Open Movie della Blender Foundation.",
-            "animazione surreale fantascienza"),
-        Film("Coffee Run", 2020,
-            "ff8fe61b-026f-4f07-b66b-2a790d6f6ab1",
-            "https://video.blender.org/static/webseed/ff8fe61b-026f-4f07-b66b-2a790d6f6ab1-720.mp4",
-            "Una giovane donna ripercorre ricordi agrodolci della sua relazione, spinta dal ritmo di un caffè.",
-            "animazione commedia romantico"),
-        Film("Cosmos Laundromat - First Cycle", 2015,
-            "f507dfdc-e73e-45a4-9778-d758cbe1ce96",
-            "https://video.blender.org/static/webseed/f507dfdc-e73e-45a4-9778-d758cbe1ce96-720.mp4",
-            "Un animale scoraggiato incontra una creatura insolita che gli propone una trasformazione inaspettata.",
-            "animazione fantasy"),
-        Film("Agent 327 - Operation Barbershop", 2017,
-            "264ff760-803e-430e-8d81-15648e904183",
-            "https://video.blender.org/static/webseed/264ff760-803e-430e-8d81-15648e904183-720.mp4",
-            "Un agente segreto entra in un negozio di barbiere e scopre un mistero molto più grande.",
-            "animazione spionaggio azione"),
-        Film("Caminandes 2 - Gran Dillama", 2013,
-            "fb70d459-48d2-4db5-adba-813c84f9200a",
-            "https://video.blender.org/static/webseed/fb70d459-48d2-4db5-adba-813c84f9200a-720.mp4",
-            "Un lama ostinato cerca di superare un ostacolo sulle montagne della Patagonia.",
-            "animazione commedia lama"),
-        Film("Caminandes 3 - Llamigos", 2016,
-            "23f3ef79-15dc-44c5-aa45-cf92e78a4509",
-            "https://video.blender.org/static/webseed/23f3ef79-15dc-44c5-aa45-cf92e78a4509-720.mp4",
-            "Due animali condividono una piccola avventura nella Patagonia innevata.",
-            "animazione commedia lama"),
-        Film("Glass Half", 2015,
-            "64222c8a-c4c7-4b3b-9850-7fb2078edcf6",
-            "https://video.blender.org/static/webseed/64222c8a-c4c7-4b3b-9850-7fb2078edcf6-720.mp4",
-            "Due critici d'arte discutono di un dipinto in una commedia animata.",
-            "animazione commedia arte"),
-        Film("Sprite Fright", 2021,
-            "a69d68a5-a0e0-4a80-9d66-49f093c97aaf",
-            "https://video.blender.org/download/videos/a69d68a5-a0e0-4a80-9d66-49f093c97aaf-720.mp4",
-            "Un gruppo di ragazzi scopre che alcune piccole creature del bosco sono meno innocue del previsto.",
-            "animazione horror commedia")
+        Film("Big Buck Bunny", 2008, "Un coniglio gigante, gentile ma determinato, si ribella agli scherzi di tre animali del bosco.", "animazione commedia coniglio"),
+        Film("Sintel", 2010, "Una giovane guerriera attraversa un mondo fantastico alla ricerca del suo amico drago.", "animazione fantasy avventura drago"),
+        Film("Tears of Steel", 2012, "Ad Amsterdam, un gruppo tenta di cambiare un evento del passato per fermare un futuro dominato dai robot.", "fantascienza sci-fi robot vfx"),
+        Film("Spring", 2019, "Una giovane pastora e il suo cane incontrano spiriti antichi in un viaggio attraverso le stagioni.", "animazione fantasy primavera"),
+        Film("Elephants Dream", 2006, "Due personaggi esplorano un mondo meccanico surreale nel primo Open Movie della Blender Foundation.", "animazione surreale fantascienza"),
+        Film("Coffee Run", 2020, "Una giovane donna ripercorre ricordi agrodolci della sua relazione, spinta dal ritmo di un caffè.", "animazione commedia romantico"),
+        Film("Cosmos Laundromat - First Cycle", 2015, "Un animale scoraggiato incontra una creatura insolita che gli propone una trasformazione inaspettata.", "animazione fantasy"),
+        Film("Agent 327 - Operation Barbershop", 2017, "Un agente segreto entra in un negozio di barbiere e scopre un mistero molto più grande.", "animazione spionaggio azione"),
+        Film("Caminandes 2 - Gran Dillama", 2013, "Un lama ostinato cerca di superare un ostacolo sulle montagne della Patagonia.", "animazione commedia lama"),
+        Film("Caminandes 3 - Llamigos", 2016, "Due animali condividono una piccola avventura nella Patagonia innevata.", "animazione commedia lama"),
+        Film("Glass Half", 2015, "Due critici d'arte discutono di un dipinto in una commedia animata.", "animazione commedia arte"),
+        Film("Sprite Fright", 2021, "Un gruppo di ragazzi scopre che alcune piccole creature del bosco sono meno innocue del previsto.", "animazione horror commedia")
     )
 
     private fun response(film: Film): SearchResponse =
@@ -110,7 +62,7 @@ class FreeCinemaProvider : MainAPI() {
         request: MainPageRequest
     ): HomePageResponse {
         return newHomePageResponse(
-            "Film completi - Blender Open Movies",
+            "Open Movies - disponibilita da verificare",
             if (page == 1) films.map(::response) else emptyList(),
             false
         )
@@ -136,15 +88,106 @@ class FreeCinemaProvider : MainAPI() {
         val film = films.firstOrNull { it.pageUrl == url }
             ?: throw IllegalArgumentException("Film non presente nel catalogo libero")
         return newMovieLoadResponse(
-            film.title, film.pageUrl, TvType.Movie, film.videoId
+            film.title, film.pageUrl, TvType.Movie, film.title
         ) {
             year = film.year
             plot = film.description +
                 "\n\nFonte: Blender Studio / Blender Foundation, Open Movies." +
-                " Contenuto pubblicato sul server ufficiale video.blender.org." +
+                " Il flusso viene recuperato dall'API ufficiale al momento della riproduzione, se disponibile." +
                 " Film disponibili nell'audio originale; il doppiaggio italiano non è garantito." +
                 " Per licenza e attribuzioni, consulta la pagina ufficiale e i titoli di coda."
         }
+    }
+
+    /**
+     * PeerTube's publicly documented REST API supplies real video IDs and
+     * media URLs. No hardcoded UUID or guessed /static/webseed path is used.
+     */
+    private suspend fun fetchJson(url: String): JSONObject? = withContext(Dispatchers.IO) {
+        var con: HttpURLConnection? = null
+        try {
+            con = (URL(url).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 7000
+                readTimeout = 7000
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("User-Agent", "FrenkyCinemaLibero/7")
+            }
+            if (con.responseCode != 200) return@withContext null
+            val body = con.inputStream.bufferedReader(Charsets.UTF_8).use {
+                it.readText().take(1_000_000)
+            }
+            JSONObject(body)
+        } catch (_: Exception) {
+            null
+        } finally {
+            con?.disconnect()
+        }
+    }
+
+    private fun officialUrl(raw: String): Boolean = try {
+        val uri = URI(raw)
+        uri.scheme.equals("https", true) &&
+            uri.host.equals("video.blender.org", true) &&
+            uri.userInfo == null && (uri.port == -1 || uri.port == 443)
+    } catch (_: Exception) { false }
+
+    private data class Link(
+        val url: String, val type: ExtractorLinkType, val quality: Int
+    )
+
+    private fun addPlayableFiles(obj: JSONObject, out: MutableList<Link>) {
+        val items = obj.optJSONArray("files") ?: return
+        for (i in 0 until items.length()) {
+            val item = items.optJSONObject(i) ?: continue
+            val url = item.optString("fileUrl")
+            if (!officialUrl(url) || !URI(url).path.endsWith(".mp4", true)) continue
+            val label = item.optJSONObject("resolution")?.optString("label").orEmpty()
+            val q = Regex("[0-9]{3,4}").find(label)?.value?.toIntOrNull()
+                ?: Qualities.Unknown.value
+            out.add(Link(url, ExtractorLinkType.VIDEO, q))
+        }
+    }
+
+    private suspend fun findRealLinks(film: Film): List<Link> {
+        val query = URLEncoder.encode(film.title, "UTF-8")
+        val response = fetchJson(mainUrl + "/api/v1/search/videos?search=" +
+            query + "&count=30") ?: return emptyList()
+        val matches = response.optJSONArray("data") ?: return emptyList()
+        val expected = normalized(film.title)
+        val ids = mutableListOf<Pair<Int, String>>()
+        for (i in 0 until matches.length()) {
+            val video = matches.optJSONObject(i) ?: continue
+            val account = video.optJSONObject("account")?.optString("name").orEmpty()
+            val channel = video.optJSONObject("channel")?.optString("displayName").orEmpty()
+            if (!account.equals("blender", true) ||
+                !channel.contains("Blender Open Movies", true)) continue
+            val title = normalized(video.optString("name"))
+            if (title != expected && !title.startsWith(expected + " ")) continue
+            if (video.optInt("duration") < 90) continue
+            val uuid = video.optString("uuid")
+            if (!Regex("[a-fA-F0-9-]{36}").matches(uuid)) continue
+            ids.add((if (title == expected) 0 else 1) to uuid)
+        }
+        for ((_, id) in ids.sortedBy { it.first }.take(3)) {
+            val info = fetchJson(mainUrl + "/api/v1/videos/" + id) ?: continue
+            val links = mutableListOf<Link>()
+            addPlayableFiles(info, links)
+            val playlists = info.optJSONArray("streamingPlaylists")
+            if (playlists != null) {
+                for (i in 0 until playlists.length()) {
+                    val item = playlists.optJSONObject(i) ?: continue
+                    val manifest = item.optString("playlistUrl")
+                    if (officialUrl(manifest) &&
+                        URI(manifest).path.endsWith(".m3u8", true)) {
+                        links.add(Link(manifest, ExtractorLinkType.M3U8,
+                            Qualities.Unknown.value))
+                    }
+                    addPlayableFiles(item, links)
+                }
+            }
+            if (links.isNotEmpty()) return links.distinctBy { it.url }
+        }
+        return emptyList()
     }
 
     override suspend fun loadLinks(
@@ -153,19 +196,16 @@ class FreeCinemaProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val film = films.firstOrNull { it.videoId == data } ?: return false
-        // Only approved HTTPS MP4 links on the official Blender Video host.
-        if (!film.streamUrl.startsWith("https://video.blender.org/") ||
-            !film.streamUrl.endsWith(".mp4")) return false
-
-        callback(newExtractorLink(
-            source = name,
-            name = "${film.title} - Blender 720p",
-            url = film.streamUrl,
-            type = ExtractorLinkType.VIDEO
-        ) {
-            quality = Qualities.P720.value
-        })
-        return true
+        val film = films.firstOrNull { it.title == data } ?: return false
+        val links = findRealLinks(film)
+        for (item in links.sortedByDescending { it.quality }.take(5)) {
+            callback(newExtractorLink(
+                source = name, name = film.title + " - Blender",
+                url = item.url, type = item.type
+            ) {
+                quality = item.quality
+            })
+        }
+        return links.isNotEmpty()
     }
 }
