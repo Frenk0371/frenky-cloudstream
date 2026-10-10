@@ -1,7 +1,7 @@
-version = 38
+version = 39
 
 cloudstream {
-    description = "Three sources only; safe daily domain checks"
+    description = "Eurostream episode titles; preserve server playback"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
