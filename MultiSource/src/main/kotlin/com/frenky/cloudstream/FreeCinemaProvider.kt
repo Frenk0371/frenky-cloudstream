@@ -140,7 +140,7 @@ class FreeCinemaProvider : MainAPI() {
         ) {
             year = film.year
             plot = film.description +
-                "\\n\\nFonte: Blender Studio / Blender Foundation, Open Movies." +
+                "\n\nFonte: Blender Studio / Blender Foundation, Open Movies." +
                 " Contenuto pubblicato sul server ufficiale video.blender.org." +
                 " Film disponibili nell'audio originale; il doppiaggio italiano non è garantito." +
                 " Per licenza e attribuzioni, consulta la pagina ufficiale e i titoli di coda."
