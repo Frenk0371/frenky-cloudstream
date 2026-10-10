@@ -3,13 +3,6 @@
   "updated_at": "2026-10-10",
   "sources": [
     {
-      "id": "altadefinizione",
-      "name": "AltaDefinizione",
-      "original_url": "https://altadefinizionex.surf/",
-      "current_url": "https://altadefinizionex.surf/",
-      "manual_aliases": []
-    },
-    {
       "id": "eurostream",
       "name": "Eurostream",
       "original_url": "https://eurostream.pics/",
@@ -30,20 +23,6 @@
       "name": "StreamingCommunity",
       "original_url": "https://streamingcommunityz.rip/",
       "current_url": "https://streamingcommunityz.rip/",
-      "manual_aliases": []
-    },
-    {
-      "id": "ilgenio",
-      "name": "Il Genio dello Streaming",
-      "original_url": "https://il-geniodellostreaming.vip/",
-      "current_url": "https://il-geniodellostreaming.vip/",
-      "manual_aliases": []
-    },
-    {
-      "id": "cb01",
-      "name": "CB01",
-      "original_url": "https://cbin99.mobi/casa/",
-      "current_url": "https://cbin99.mobi/casa/",
       "manual_aliases": []
     }
   ]
