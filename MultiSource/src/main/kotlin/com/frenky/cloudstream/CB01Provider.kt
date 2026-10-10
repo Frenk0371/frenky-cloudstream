@@ -52,16 +52,32 @@ class CB01Provider(private val source: Source) : MainAPI() {
         safeHttps(url) && URI(url).host.equals(URI(mainUrl).host, true)
     } catch (_: Exception) { false }
 
+    // Accept old saved CB01 cards only when their legacy host is known.
+    // Keep the original full path: never redirect arbitrary hosts.
+    private fun canonical(raw: String): String? = try {
+        if (!safeHttps(raw)) null else {
+            val uri = URI(raw)
+            val host = uri.host.lowercase().removePrefix("www.")
+            val current = URI(mainUrl).host.lowercase().removePrefix("www.")
+            when (host) {
+                current -> raw
+                "cbin99.mobi" -> URI("https", null, current, -1,
+                    uri.rawPath, uri.rawQuery, null).toASCIIString()
+                else -> null
+            }
+        }
+    } catch (_: Exception) { null }
+
     override suspend fun load(url: String): LoadResponse {
-        if (!official(url)) throw IllegalArgumentException("Film fuori dal sito CB01")
-        val doc = Jsoup.parse(html(url), url)
+        val resolved = canonical(url) ?: throw IllegalArgumentException("Film fuori dal sito CB01")
+        val doc = Jsoup.parse(html(resolved), resolved)
         val title = doc.selectFirst("h1")?.text()?.trim()?.takeIf { it.isNotEmpty() }
             ?: doc.selectFirst("meta[property=og:title]")?.attr("content")
             ?: "Film"
-        val poster = catalogue.posterFor(url) ?: PosterFinder.fromDocument(doc, title)
+        val poster = catalogue.posterFor(url) ?: catalogue.posterFor(resolved) ?: PosterFinder.fromDocument(doc, title)
         val description = doc.selectFirst("meta[property=og:description]")?.attr("content")
             ?: doc.selectFirst("meta[name=description]")?.attr("content") ?: ""
-        return newMovieLoadResponse(title, url, TvType.Movie, url) {
+        return newMovieLoadResponse(title, resolved, TvType.Movie, resolved) {
             posterUrl = poster
             plot = description.take(950) + "\n\nI collegamenti video sono disponibili soltanto se il sito espone player compatibili con CloudStream."
         }
@@ -73,18 +89,18 @@ class CB01Provider(private val source: Source) : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        if (!official(data)) return false
-        val document = Jsoup.parse(html(data), data)
+        val resolved = canonical(data) ?: return false
+        val document = Jsoup.parse(html(resolved), resolved)
         // Standard embeds only: do not automate clicks, bypass ads, CAPTCHA, DRM or access checks.
         val players = document.select("iframe[src], iframe[data-src]")
             .flatMap { listOf(it.absUrl("src"), it.absUrl("data-src")) }
-            .filter { safeHttps(it) && it != data && !official(it) }
+            .filter { safeHttps(it) && it != resolved && !official(it) }
             .distinct().take(12)
         var count = 0
         val seen = mutableSetOf<String>()
         for (player in players) {
             try {
-                loadExtractor(player, data, subtitleCallback) { video ->
+                loadExtractor(player, resolved, subtitleCallback) { video ->
                     if (safeHttps(video.url) && seen.add(video.url)) {
                         callback(video)
                         count++
