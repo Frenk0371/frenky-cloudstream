@@ -60,11 +60,13 @@ internal object ManualMediaBrowser {
             suspendCancellableCoroutine { continuation ->
                 val layout = LinearLayout(activity).apply {
                     orientation = LinearLayout.VERTICAL
-                    setPadding(12, 8, 12, 8)
+                    setPadding(4, 2, 4, 2)
                 }
                 val status = TextView(activity).apply {
                     text = "Chiudi manualmente l'eventuale pubblicità e avvia il video. Nessun collegamento rilevato."
-                    setPadding(8, 8, 8, 8)
+                    setPadding(4, 2, 4, 2)
+                    textSize = 12f
+                    maxLines = 2
                 }
                 val accept = Button(activity).apply {
                     text = "Usa il video rilevato"
@@ -100,7 +102,6 @@ internal object ManualMediaBrowser {
 
                 var captured: SelectedMedia? = null
                 val dialog = AlertDialog.Builder(activity)
-                    .setTitle("Player nel browser (sperimentale)")
                     .setView(layout)
                     .setNegativeButton("Annulla") { d, _ -> d.dismiss() }
                     .create()
@@ -115,7 +116,26 @@ internal object ManualMediaBrowser {
                         view?.requestFocus()
                     }
                 }
-                // Some tablet WebViews render a blank frame until the screen wakes.\n                // Request redraws after navigation without reloading the page,\n                // so CAPTCHA state, cookies and playback handling stay intact.\n                fun refreshRendering(view: WebView?) {\n                    view ?: return\n                    view.post { view.invalidate() }\n                    view.postDelayed({ view.invalidate() }, 350L)\n                    view.postDelayed({ view.invalidate() }, 1200L)\n                }\n\n                browser.webViewClient = object : WebViewClient() {\n                    override fun onPageFinished(view: WebView?, url: String?) {\n                        super.onPageFinished(view, url)\n                        refreshRendering(view)\n                    }\n\n                    override fun onPageCommitVisible(view: WebView?, url: String?) {\n                        super.onPageCommitVisible(view, url)\n                        refreshRendering(view)\n                    }
+                // Some tablet WebViews render a blank frame until the screen wakes.
+                // Request redraws after navigation without reloading the page,
+                // so CAPTCHA state, cookies and playback handling stay intact.
+                fun refreshRendering(view: WebView?) {
+                    view ?: return
+                    view.post { view.invalidate() }
+                    view.postDelayed({ view.invalidate() }, 350L)
+                    view.postDelayed({ view.invalidate() }, 1200L)
+                }
+
+                browser.webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        refreshRendering(view)
+                    }
+
+                    override fun onPageCommitVisible(view: WebView?, url: String?) {
+                        super.onPageCommitVisible(view, url)
+                        refreshRendering(view)
+                    }
                     override fun shouldOverrideUrlLoading(
                         view: WebView?, request: WebResourceRequest?
                     ): Boolean {
@@ -147,10 +167,10 @@ internal object ManualMediaBrowser {
                 }
                 layout.addView(status, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-                layout.addView(accept, LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(browser, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+                layout.addView(accept, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 
                 accept.setOnClickListener { captured?.let(::finish) }
                 dialog.setOnDismissListener {
