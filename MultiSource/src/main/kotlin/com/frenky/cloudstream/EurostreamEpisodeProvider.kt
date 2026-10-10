@@ -311,16 +311,16 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
 
         val document = Jsoup.parse(documentHtml, pageUrl)
         val found = LinkedHashMap<String, PublicMedia>()
-        // Direct HTML5 sources, including standard lazy-loaded data-src attributes.
-        for (node in document.select(
-            "video[src], video source[src], video[data-src], video source[data-src]"
-        )) {
-            val attribute = if (node.hasAttr("src")) "src" else "data-src"
-            val media = node.absUrl(attribute)
-            if (!publicHttps(media)) continue
-            val type = mediaFormat(media, node.attr("type")) ?: continue
-            found.putIfAbsent(media, PublicMedia(media, type, pageUrl))
-            if (found.size == 4) return found.values.toList()
+        // Standard HTML5 sources; accept ordinary lazy-loading attributes.
+        for (node in document.select("video, video source, source")) {
+            for (attribute in listOf("src", "data-src", "data-file")) {
+                if (!node.hasAttr(attribute)) continue
+                val media = node.absUrl(attribute)
+                if (!publicHttps(media)) continue
+                val type = mediaFormat(media, node.attr("type")) ?: continue
+                found.putIfAbsent(media, PublicMedia(media, type, pageUrl))
+                if (found.size == 4) return found.values.toList()
+            }
         }
         // Public, explicitly declared media URLs in HTML metadata.
         for (node in document.select(
