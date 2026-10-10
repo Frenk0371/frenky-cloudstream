@@ -1,6 +1,24 @@
-# Frenky CloudStream — Beta 14
+# Frenky CloudStream — Beta 15
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
+
+## Beta 15: confronto con Veezie e host esterni
+
+- Eurostream usa ora l'indirizzo attivo `https://eurostreamings.yachts/` anche
+  nella configurazione centrale, mantenendo `eurostream.pics` come riferimento storico.
+- Gli URL intermedi sono seguiti **solo quando il server restituisce normali
+  redirect HTTP** (massimo 3). Le pagine SafeGo che richiedono un codice o
+  un'altra verifica non vengono saltate né completate automaticamente.
+- Dove un player pubblico espone nel normale HTML un URL MP4/HLS/DASH in un
+  elemento `video` o in una configurazione JavaScript non offuscata, il link
+  può essere passato a CloudStream. Non viene eseguito JavaScript.
+- **Non è stato verificato che DeltaBit per The Sentinel restituisca un flusso
+  accessibile alla Beta 15.** Veezie possiede un proprio estrattore e non
+  espone necessariamente lo stesso stream utilizzabile da CloudStream.
+- Non vengono effettuati tentativi automatici di superamento di CAPTCHA,
+  login, DRM, controlli di accesso o limitazioni del player.
+- È necessario il test reale sul tablet e, se l'episodio non parte,
+  verificare i log Android con tag `FrenkyCloudStream`.
 
 ## Beta 14: lettore HTML5 standard e MPEG-DASH
 
@@ -63,7 +81,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 14 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 15 **non garantisce l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -120,7 +138,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 14 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 14** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 15 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 15** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 

@@ -1,7 +1,7 @@
-version = 14
+version = 15
 
 cloudstream {
-    description = "Standard HTML5 video source detection and MPEG-DASH support"
+    description = "Public redirect support and HTML5 player media detection"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")

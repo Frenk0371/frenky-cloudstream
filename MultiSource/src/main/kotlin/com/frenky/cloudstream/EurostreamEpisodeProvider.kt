@@ -306,22 +306,78 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
             if (!publicHttps(media)) continue
             val type = mediaFormat(media, node.attr("type")) ?: continue
             found.putIfAbsent(media, PublicMedia(media, type))
-            if (found.size == 4) break
+            if (found.size == 4) return found.values.toList()
+        }
+        // Also read plain, directly declared media in common player scripts.
+        // This is only text parsing: no packed JS, eval, protected requests,
+        // forms or interactive verification are performed.
+        val plainFile = Regex("""(?i)(?:\bfile\b|\bsrc\b)\s*:\s*['"](https://[^'"\s<>]+)['"]""")
+        for (script in document.select("script")) {
+            val data = script.data()
+            if (!data.contains("jwplayer", ignoreCase = true) &&
+                !data.contains("sources", ignoreCase = true) &&
+                !data.contains("file:", ignoreCase = true)) continue
+            for (candidate in plainFile.findAll(data).take(8)) {
+                val media = candidate.groupValues[1].replace("&amp;", "&")
+                if (!publicHttps(media)) continue
+                val type = mediaFormat(media) ?: continue
+                found.putIfAbsent(media, PublicMedia(media, type))
+                if (found.size == 4) return found.values.toList()
+            }
         }
         return found.values.toList()
     }
 
-    private suspend fun openlyAvailableHtml5Media(pageUrl: String): List<PublicMedia> {
-        val host = runCatching { URI(pageUrl).host?.lowercase(Locale.ROOT) }
-            .getOrNull().orEmpty()
-        // These are interstitial/verification pages, not video players.
-        if (host == "clicka.cc" || host.endsWith(".clicka.cc") ||
-            host == "safego.cc" || host.endsWith(".safego.cc")) return emptyList()
-
-        val body = html(pageUrl)
-        if (body.isBlank() || !body.contains("<video", ignoreCase = true)) {
-            return emptyList()
+    /**
+     * Follow only ordinary HTTP redirects (up to three); do not follow HTML
+     * interstitials, execute scripts, submit forms, or answer challenges.
+     */
+    private suspend fun publicHttpDestination(url: String): String = withContext(Dispatchers.IO) {
+        var current = url
+        val visited = mutableSetOf<String>()
+        for (hop in 0 until 3) {
+            if (!publicHttps(current) || !visited.add(current)) break
+            if (runCatching { URI(current).host?.endsWith("safego.cc") == true }
+                    .getOrDefault(false)) break
+            var connection: HttpURLConnection? = null
+            try {
+                connection = (URL(current).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    instanceFollowRedirects = false
+                    setRequestProperty("Accept", "text/html,application/xhtml+xml")
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile)")
+                }
+                val status = connection.responseCode
+                if (status !in setOf(301, 302, 303, 307, 308)) break
+                val location = connection.getHeaderField("Location") ?: break
+                val next = URI(current).resolve(location).toString()
+                if (!publicHttps(next) || next in visited) break
+                current = next
+            } catch (_: Exception) {
+                break
+            } finally {
+                connection?.disconnect()
+            }
         }
+        current
+    }
+
+    private fun isIntermediary(url: String): Boolean {
+        val host = runCatching { URI(url).host?.lowercase(Locale.ROOT) }
+            .getOrNull().orEmpty()
+        return host == "clicka.cc" || host.endsWith(".clicka.cc") ||
+            host == "safego.cc" || host.endsWith(".safego.cc")
+    }
+
+    private suspend fun openlyAvailableHtml5Media(pageUrl: String): List<PublicMedia> {
+        // These are interstitial/verification pages, not video players.
+        if (isIntermediary(pageUrl)) return emptyList()
+        val body = html(pageUrl)
+        if (body.isBlank() || (!body.contains("<video", ignoreCase = true) &&
+                !body.contains("jwplayer", ignoreCase = true) &&
+                !body.contains("sources:", ignoreCase = true))) return emptyList()
         return parseHtml5Media(pageUrl, body)
     }
 
@@ -356,30 +412,36 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                 continue
             }
             val before = emitted
-            try {
-                loadExtractor(url, origin, subtitleCallback) { video ->
-                    if (publicHttps(video.url)) {
-                        callback(video)
-                        emitted++
+            // Some known URL shorteners return a plain HTTP 301/302/307.
+            // A CAPTCHA or JavaScript landing page never yields a video URL.
+            val destination = if (isIntermediary(url)) publicHttpDestination(url) else url
+            val candidates = linkedSetOf(url, destination)
+            for (candidate in candidates) {
+                if (emitted != before || isIntermediary(candidate)) continue
+                try {
+                    loadExtractor(candidate, origin, subtitleCallback) { video ->
+                        if (publicHttps(video.url) && seen.add(video.url)) {
+                            callback(video)
+                            emitted++
+                        }
                     }
+                } catch (error: Exception) {
+                    val host = runCatching { URI(candidate).host }.getOrNull().orEmpty()
+                    Log.w("FrenkyCloudStream", "Eurostream: extractor failure for " +
+                        host + " (" + error.javaClass.simpleName + ")")
                 }
-                if (emitted == before) {
-                    val host = runCatching { URI(url).host }.getOrNull().orEmpty()
-                    Log.i("FrenkyCloudStream", "Eurostream: no media resolved for " +
-                        host + " (unsupported player, redirect or interactive check)")
-                }
-            } catch (error: Exception) {
-                // Log only host and exception name, never URLs or session tokens.
-                val host = runCatching { URI(url).host }.getOrNull().orEmpty()
-                Log.w("FrenkyCloudStream", "Eurostream: extractor failure for " +
-                    host + " (" + error.javaClass.simpleName + ")")
+            }
+            if (emitted == before) {
+                val host = runCatching { URI(destination).host }.getOrNull().orEmpty()
+                Log.i("FrenkyCloudStream", "Eurostream: no supported extractor for " +
+                    host + " (possibly an interactive verification page)")
             }
             // A public, plain HTML5 video element may be playable even when
             // CloudStream has no named extractor for its host.
             // Never interpret iframes, script-generated URLs, or challenges as streams.
             if (emitted == before) {
                 try {
-                    for (media in openlyAvailableHtml5Media(url)) {
+                    for (media in openlyAvailableHtml5Media(destination)) {
                         if (!seen.add(media.url)) continue
                         callback(newExtractorLink(
                             source = name,
@@ -387,13 +449,13 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                             url = media.url,
                             type = media.format
                         ) {
-                            referer = url
+                            referer = destination
                             quality = Qualities.Unknown.value
                         })
                         emitted++
                     }
                 } catch (error: Exception) {
-                    val host = runCatching { URI(url).host }.getOrNull().orEmpty()
+                    val host = runCatching { URI(destination).host }.getOrNull().orEmpty()
                     Log.w("FrenkyCloudStream", "Eurostream: HTML5 parse error at " +
                         host + " (" + error.javaClass.simpleName + ")")
                 }

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": null,
+  "updated_at": "2026-10-10",
   "sources": [
     {"id":"altadefinizione","name":"AltaDefinizione","original_url":"https://altadefinizionex.surf/","current_url":"https://altadefinizionex.surf/","manual_aliases":[]},
-    {"id":"eurostream","name":"Eurostream","original_url":"https://eurostream.pics/","current_url":"https://eurostream.pics/","manual_aliases":[]},
+    {"id":"eurostream","name":"Eurostream","original_url":"https://eurostream.pics/","current_url":"https://eurostreamings.yachts/","manual_aliases":["https://eurostream.pics/"]},
     {"id":"guardaserie","name":"GuardaSerie","original_url":"https://guardaseriex.click/","current_url":"https://guardaseriex.click/","manual_aliases":[]},
     {"id":"streamingcommunity","name":"StreamingCommunity","original_url":"https://streamingcommunityz.rip/","current_url":"https://streamingcommunityz.rip/","manual_aliases":[]},
     {"id":"ilgenio","name":"Il Genio dello Streaming","original_url":"https://il-geniodellostreaming.vip/","current_url":"https://il-geniodellostreaming.vip/","manual_aliases":[]},
