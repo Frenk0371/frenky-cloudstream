@@ -58,6 +58,7 @@ subprojects {
         val implementation by configurations
         cloudstream("com.lagradost:cloudstream3:pre-release")
         implementation(kotlin("stdlib"))
+        implementation("org.jsoup:jsoup:1.18.3")
     }
 }
 
