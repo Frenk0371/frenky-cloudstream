@@ -1,7 +1,7 @@
-version = 34
+version = 35
 
 cloudstream {
-    description = "Eurostream poster sync for details and favorites"
+    description = "CB01 domain refresh; Eurostream poster sync"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
