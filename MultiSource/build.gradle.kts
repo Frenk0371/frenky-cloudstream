@@ -1,7 +1,7 @@
-version = 25
+version = 26
 
 cloudstream {
-    description = "Website zoom controls and mobile viewport"
+    description = "Rollback zoom changes to restore v24 playback"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
