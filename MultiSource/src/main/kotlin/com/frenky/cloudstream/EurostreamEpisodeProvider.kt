@@ -209,7 +209,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
         val description = document.selectFirst("meta[property=og:description]")?.attr("content")
             ?: document.selectFirst("meta[name=description]")?.attr("content")
             ?: ""
-        val artwork = PosterFinder.fromDocument(document, title)
+        val artwork = catalogue.posterFor(url) ?: PosterFinder.fromDocument(document, title)
         val listings = parseEpisodes(document)
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
