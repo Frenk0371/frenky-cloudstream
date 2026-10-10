@@ -420,8 +420,11 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
         // direct stream. Inspect at most two of them, one level deep; do not
         // execute JavaScript, follow further frames or handle access challenges.
         val document = Jsoup.parse(body, pageUrl)
-        val frames = document.select("iframe[src]").map { it.absUrl("src") }
-            .filter { publicHttps(it) && !isIntermediary(it) && it != pageUrl }
+        val frames = document.select("iframe[src], iframe[data-src]").flatMap { frame ->
+            listOf("src", "data-src").mapNotNull { attribute ->
+                if (frame.hasAttr(attribute)) frame.absUrl(attribute) else null
+            }
+        }.filter { publicHttps(it) && !isIntermediary(it) && it != pageUrl }
             .distinct().take(2)
         for (frameUrl in frames) {
             val frameBody = html(frameUrl)
