@@ -189,6 +189,80 @@
               "text": "Reacher"
             }
           ]
+        },
+        "dle_story_get": {
+          "http_status": 200,
+          "final_url": "https://altadefinizionex.surf/?story=reacher",
+          "content_length_sample": 250000,
+          "forms": [
+            {
+              "method": "get",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca titolo"
+                }
+              ]
+            },
+            {
+              "method": "get",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca titolo"
+                }
+              ]
+            }
+          ],
+          "script_tags": 28,
+          "links_total_sample": 209,
+          "matching_titles": [
+            {
+              "url": "/serie-tv/26710-reacher-streaming.html",
+              "class": "",
+              "title": "",
+              "text": "Reacher"
+            }
+          ]
+        },
+        "root_wordpress_s": {
+          "http_status": 200,
+          "final_url": "https://altadefinizionex.surf/?s=reacher",
+          "content_length_sample": 250000,
+          "forms": [
+            {
+              "method": "get",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca titolo"
+                }
+              ]
+            },
+            {
+              "method": "get",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca titolo"
+                }
+              ]
+            }
+          ],
+          "script_tags": 32,
+          "links_total_sample": 209,
+          "matching_titles": [
+            {
+              "url": "/serie-tv/26710-reacher-streaming.html",
+              "class": "",
+              "title": "",
+              "text": "Reacher"
+            }
+          ]
         }
       }
     },
@@ -400,6 +474,88 @@
               "text": "2022 Series Reacher"
             }
           ]
+        },
+        "dle_story_get": {
+          "http_status": 200,
+          "final_url": "https://cbin99.mobi/casa/?story=reacher",
+          "content_length_sample": 175412,
+          "forms": [
+            {
+              "method": "get",
+              "action": "/",
+              "inputs": [
+                {
+                  "name": "s",
+                  "placeholder": "Ricerca..."
+                }
+              ]
+            },
+            {
+              "method": "get",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "",
+                  "placeholder": "Inserisci l'email"
+                },
+                {
+                  "name": "",
+                  "placeholder": "Parola d'ordine"
+                }
+              ]
+            }
+          ],
+          "script_tags": 10,
+          "links_total_sample": 151,
+          "matching_titles": [
+            {
+              "url": "/spettacoli-televisivi/108978/reacher/",
+              "class": "",
+              "title": "",
+              "text": "2022 Series Reacher"
+            }
+          ]
+        },
+        "root_wordpress_s": {
+          "http_status": 200,
+          "final_url": "https://cbin99.mobi/?s=reacher",
+          "content_length_sample": 87771,
+          "forms": [
+            {
+              "method": "get",
+              "action": "/",
+              "inputs": [
+                {
+                  "name": "s",
+                  "placeholder": "Ricerca..."
+                }
+              ]
+            },
+            {
+              "method": "get",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "",
+                  "placeholder": "Inserisci l'email"
+                },
+                {
+                  "name": "",
+                  "placeholder": "Parola d'ordine"
+                }
+              ]
+            }
+          ],
+          "script_tags": 10,
+          "links_total_sample": 58,
+          "matching_titles": [
+            {
+              "url": "/spettacoli-televisivi/108978/reacher/",
+              "class": "",
+              "title": "",
+              "text": "2022 Reacher"
+            }
+          ]
         }
       }
     },
@@ -531,6 +687,79 @@
           "script_tags": 18,
           "links_total_sample": 102,
           "matching_titles": []
+        },
+        "dle_story_get": {
+          "http_status": 200,
+          "final_url": "https://eurostream.pics/?story=reacher",
+          "content_length_sample": 42654,
+          "forms": [
+            {
+              "method": "get",
+              "action": "https://eurostream.pics/",
+              "inputs": [
+                {
+                  "name": "s",
+                  "placeholder": "Cerca …"
+                },
+                {
+                  "name": "",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "script_tags": 18,
+          "links_total_sample": 102,
+          "matching_titles": []
+        },
+        "root_wordpress_s": {
+          "http_status": 200,
+          "final_url": "https://eurostream.pics/?s=reacher",
+          "content_length_sample": 31873,
+          "forms": [
+            {
+              "method": "get",
+              "action": "https://eurostream.pics/",
+              "inputs": [
+                {
+                  "name": "s",
+                  "placeholder": "Cerca …"
+                },
+                {
+                  "name": "",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "script_tags": 17,
+          "links_total_sample": 77,
+          "matching_titles": [
+            {
+              "url": "https://eurostream.pics/reacher/",
+              "class": "",
+              "title": "Reacher",
+              "text": ""
+            },
+            {
+              "url": "https://eurostream.pics/reacher/",
+              "class": "",
+              "title": "Reacher",
+              "text": "Reacher"
+            },
+            {
+              "url": "https://eurostream.pics/preacher-6/",
+              "class": "",
+              "title": "Preacher",
+              "text": ""
+            },
+            {
+              "url": "https://eurostream.pics/preacher-6/",
+              "class": "",
+              "title": "Preacher",
+              "text": "Preacher"
+            }
+          ]
         }
       }
     },
@@ -882,6 +1111,112 @@
               "text": "Preacher"
             }
           ]
+        },
+        "dle_story_get": {
+          "http_status": 200,
+          "final_url": "https://guardaseriex.click/?story=reacher",
+          "content_length_sample": 108598,
+          "forms": [
+            {
+              "method": "get",
+              "action": "/index.php",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca Serie"
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            },
+            {
+              "method": "get",
+              "action": "/index.php",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca Serie"
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "script_tags": 14,
+          "links_total_sample": 211,
+          "matching_titles": [
+            {
+              "url": "https://guardaseriex.click/azione/1998-reacher.html",
+              "class": "",
+              "title": "",
+              "text": "Reacher"
+            }
+          ]
+        },
+        "root_wordpress_s": {
+          "http_status": 200,
+          "final_url": "https://guardaseriex.click/?s=reacher",
+          "content_length_sample": 108598,
+          "forms": [
+            {
+              "method": "get",
+              "action": "/index.php",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca Serie"
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            },
+            {
+              "method": "get",
+              "action": "/index.php",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca Serie"
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "script_tags": 14,
+          "links_total_sample": 211,
+          "matching_titles": [
+            {
+              "url": "https://guardaseriex.click/azione/1998-reacher.html",
+              "class": "",
+              "title": "",
+              "text": "Reacher"
+            }
+          ]
         }
       }
     },
@@ -1224,6 +1559,98 @@
               "text": "Jack Reacher - La prova decisiva"
             }
           ]
+        },
+        "dle_story_get": {
+          "http_status": 200,
+          "final_url": "https://il-geniodellostreaming.vip/?story=reacher",
+          "content_length_sample": 86091,
+          "forms": [
+            {
+              "method": "post",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca..."
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            },
+            {
+              "method": "post",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca..."
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "script_tags": 16,
+          "links_total_sample": 353,
+          "matching_titles": []
+        },
+        "root_wordpress_s": {
+          "http_status": 200,
+          "final_url": "https://il-geniodellostreaming.vip/?s=reacher",
+          "content_length_sample": 86091,
+          "forms": [
+            {
+              "method": "post",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca..."
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            },
+            {
+              "method": "post",
+              "action": "",
+              "inputs": [
+                {
+                  "name": "story",
+                  "placeholder": "Cerca..."
+                },
+                {
+                  "name": "do",
+                  "placeholder": ""
+                },
+                {
+                  "name": "subaction",
+                  "placeholder": ""
+                }
+              ]
+            }
+          ],
+          "script_tags": 16,
+          "links_total_sample": 353,
+          "matching_titles": []
         }
       }
     },
@@ -1270,6 +1697,24 @@
         "dle_post": {
           "error": "HTTPError",
           "http_status": 405
+        },
+        "dle_story_get": {
+          "http_status": 200,
+          "final_url": "https://streamingcommunityz.rip/?story=reacher",
+          "content_length_sample": 250000,
+          "forms": [],
+          "script_tags": 6,
+          "links_total_sample": 1,
+          "matching_titles": []
+        },
+        "root_wordpress_s": {
+          "http_status": 200,
+          "final_url": "https://streamingcommunityz.rip/?s=reacher",
+          "content_length_sample": 250000,
+          "forms": [],
+          "script_tags": 6,
+          "links_total_sample": 1,
+          "matching_titles": []
         }
       }
     }
