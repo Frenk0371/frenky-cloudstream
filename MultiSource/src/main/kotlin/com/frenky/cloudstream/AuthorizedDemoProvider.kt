@@ -7,50 +7,67 @@ import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.newExtractorLink
 
 /**
- * Reproducible native-player smoke test using a freely licensed Blender Open Movie.
- * Kept separate from the metadata-only third-party catalogue providers.
- * No scraping, video extraction, DRM circumvention, or third-party authentication.
+ * Native-player smoke tests using openly shareable sample clips.
+ * Kept separate from metadata-only third-party catalogue providers.
+ * No website scraping, video extraction, access-control bypass or DRM.
  */
 class AuthorizedDemoProvider : MainAPI() {
-    override var mainUrl = "https://storage.googleapis.com"
+    override var mainUrl = "https://www.w3schools.com"
     override var name = "Frenky - Test Player"
     override var lang = "it"
     override val supportedTypes = setOf(TvType.Movie)
     override val hasMainPage = true
 
-    private val demoUrl =
-        "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    private data class TestClip(
+        val title: String,
+        val url: String,
+        val description: String
+    )
+
+    // Old Google GTV samples may return HTTP 403. Independent hosts make
+    // connectivity/player troubleshooting possible without altering catalogues.
+    private val clips = listOf(
+        TestClip(
+            "Big Buck Bunny - prova 10 secondi",
+            "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+            "Clip di prova tratto da Big Buck Bunny. (c) Blender Foundation, CC BY 3.0."
+        ),
+        TestClip(
+            "Video alternativo - W3Schools",
+            "https://www.w3schools.com/html/mov_bbb.mp4",
+            "Secondo server indipendente per collaudare la riproduzione MP4."
+        ),
+        TestClip(
+            "Flower - prova video MDN",
+            "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+            "Video di esempio CC0 di MDN per collaudare il lettore MP4."
+        )
+    )
+
+    private fun response(clip: TestClip): SearchResponse =
+        newMovieSearchResponse(clip.title, clip.url, TvType.Movie) {}
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val films = if (page == 1) listOf(demoSearchResponse()) else emptyList()
-        return newHomePageResponse("Test lettore interno", films, false)
-    }
-
-    private fun demoSearchResponse(): SearchResponse {
-        return newMovieSearchResponse(
-            "Big Buck Bunny - video di prova", demoUrl, TvType.Movie
-        ) {}
+        val available = if (page == 1) clips.map(::response) else emptyList()
+        return newHomePageResponse("Prove di riproduzione", available, false)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val q = query.trim()
-        return if (q.isNotBlank() &&
-            ("big buck bunny".contains(q, ignoreCase = true) ||
-             "test player".contains(q, ignoreCase = true) ||
-             "video di prova".contains(q, ignoreCase = true))
-        ) listOf(demoSearchResponse()) else emptyList()
+        val trimmed = query.trim()
+        if (trimmed.isBlank()) return emptyList()
+        if ("test".contains(trimmed, true) || "prova".contains(trimmed, true) ||
+            "player".contains(trimmed, true)) return clips.map(::response)
+        return clips.filter { it.title.contains(trimmed, true) }.map(::response)
     }
 
     override suspend fun load(url: String): LoadResponse {
-        require(url == demoUrl) { "URL non autorizzato per il player di test" }
-        return newMovieLoadResponse(
-            "Big Buck Bunny - video di prova", demoUrl, TvType.Movie, demoUrl
-        ) {
-            plot = "Video dimostrativo aperto di Blender Foundation. " +
-                "Serve esclusivamente a verificare la riproduzione nativa in CloudStream."
+        val clip = clips.firstOrNull { it.url == url }
+            ?: throw IllegalArgumentException("URL non autorizzato per il player di test")
+        return newMovieLoadResponse(clip.title, clip.url, TvType.Movie, clip.url) {
+            plot = clip.description + " Riproduzione diretta nel player interno di CloudStream."
         }
     }
 
@@ -60,12 +77,12 @@ class AuthorizedDemoProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        if (data != demoUrl) return false
+        val clip = clips.firstOrNull { it.url == data } ?: return false
         callback(
             newExtractorLink(
                 source = name,
-                name = "Big Buck Bunny - MP4",
-                url = demoUrl,
+                name = clip.title,
+                url = clip.url,
                 type = ExtractorLinkType.VIDEO
             ) {
                 quality = Qualities.Unknown.value
