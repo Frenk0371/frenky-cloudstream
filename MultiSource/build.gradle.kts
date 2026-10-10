@@ -1,7 +1,7 @@
-version = 29
+version = 30
 
 cloudstream {
-    description = "Fullscreen browser dialog with stable v28 playback"
+    description = "Centered browser dialog with minimum height"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
