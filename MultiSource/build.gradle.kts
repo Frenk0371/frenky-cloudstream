@@ -1,7 +1,7 @@
-version = 40
+version = 41
 
 cloudstream {
-    description = "Fix StreamingCommunity detail-page domain validation"
+    description = "Rebuild v41 with StreamingCommunity detail-page fix"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
