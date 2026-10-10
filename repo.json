@@ -1,0 +1,8 @@
+{
+  "name": "Frenky CloudStream (beta)",
+  "description": "Registro di domini, provider non implementati.",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json"
+  ]
+}

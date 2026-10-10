@@ -1,0 +1,22 @@
+[
+    {
+        "fileHash": "sha256-ca044fea7ee9c58a0df2e70f09fbac1ee6345892194012d8b953444c686e465c",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Frenk0371/frenky-cloudstream",
+        "fileSize": 97257,
+        "status": 3,
+        "language": "it",
+        "authors": [
+            "Frenky"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 42,
+        "internalName": "MultiSource",
+        "description": "Eurostream only; remove duplicate catalogue sources",
+        "url": "https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3",
+        "name": "MultiSource"
+    }
+]
