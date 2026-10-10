@@ -75,12 +75,12 @@ def request(url, method='GET', fields=None):
 
 def probe(src):
     base = src["current_url"].rstrip("/") + "/"
-    variants = [
+    from urllib.parse import urlsplit\n    parts = urlsplit(base)\n    origin = f"{parts.scheme}://{parts.netloc}/"\n    variants = [
         ("homepage", base),
         ("wordpress_s", base + "?" + urlencode({"s": SEARCH})),
         ("query_search", base + "?" + urlencode({"search": SEARCH})),
         ("dle_get", base + "?" + urlencode({"do":"search","subaction":"search","story":SEARCH})),
-        ("dle_post", base),
+        ("dle_post", base),\n        ("dle_story_get", base + "?" + urlencode({"story": SEARCH})),\n        ("root_wordpress_s", origin + "?" + urlencode({"s": SEARCH})),
     ]
     return {"id":src["id"], "name":src["name"],
             "variants":{name:request(url, "POST" if name == "dle_post" else "GET",
