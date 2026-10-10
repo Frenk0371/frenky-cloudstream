@@ -40,7 +40,7 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
     private val episodeRegex = Regex("""(?i)\b([0-9]{1,2})\s*[x×]\s*([0-9]{1,3})\b""")
     private val simpleEpisodeRegex = Regex("""(?i)\bepisodi[oa]?\s*(?:n\.?\s*)?([0-9]{1,3})\b""")
     private val supportedLabels = Regex(
-        """(?i)turbovid|delta[\\s._-]*bit|streamtape|mixdrop|dood|voe|vixcloud|vidoza|supervideo|filemoon|upstream|uqload|vidmoly|streamwish|mp4upload"""
+        """(?i)turbovid|delta[\s._-]*bit|streamtape|mixdrop|dood|voe|vixcloud|vidoza|supervideo|filemoon|upstream|uqload|vidmoly|streamwish|mp4upload"""
     )
 
     private data class EpisodeId(val season: Int, val number: Int)
@@ -397,7 +397,7 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
             val label = player.optString("name", "Server")
             val host = runCatching { URI(url).host }.getOrNull().orEmpty()
             Log.i("FrenkyCloudStream", "Eurostream: trying server " +
-                label.replace(Regex("""[\\r\\n\\t]"""), " ").take(40) + " at " + host)
+                label.replace(Regex("""[\r\n\t]"""), " ").take(40) + " at " + host)
             val directFormat = mediaFormat(url)
             if (directFormat != null) {
                 callback(newExtractorLink(
