@@ -50,6 +50,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
     private data class VideoPage(val name: String, val url: String)
     private data class EpisodeListing(
         val id: EpisodeId,
+        var title: String = "",
         val videoPages: LinkedHashMap<String, VideoPage> = linkedMapOf()
     )
 
@@ -154,7 +155,18 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
                     val episode = it.groupValues[2].toIntOrNull() ?: 0
                     if (season in 1..99 && episode in 1..999) {
                         active = EpisodeId(season, episode)
-                        found.getOrPut(active!!) { EpisodeListing(active!!) }
+                        val listing = found.getOrPut(active!!) { EpisodeListing(active!!) }
+                        // Preserve the episode title displayed in the public listing.
+                        val rawTitle = value.substring(it.range.last + 1)
+                            .split(Regex("""\\s+[–—-]\\s+"""), limit = 2).first()
+                            .trim(' ', ':', '-', '–', '—')
+                            .trim()
+                        if (listing.title.isBlank() &&
+                            rawTitle.length in 2..120 &&
+                            !supportedLabels.containsMatchIn(rawTitle) &&
+                            !rawTitle.matches(Regex("""(?i)episodi?[oa]?\\s*\\d*"""))) {
+                            listing.title = rawTitle
+                        }
                     }
                 }
                 // Some posts label a season once and write "Episodio 01" on
@@ -246,7 +258,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
                 .put("players", links)
                 .toString()
             newEpisode(data, initializer = {
-                name = "Episodio " + listing.id.number +
+                name = listing.title.ifBlank { "Episodio " + listing.id.number } +
                     if (listing.videoPages.isEmpty()) " (nessun server individuato)" else ""
                 season = listing.id.season
                 episode = listing.id.number
