@@ -209,8 +209,17 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
         val description = document.selectFirst("meta[property=og:description]")?.attr("content")
             ?: document.selectFirst("meta[name=description]")?.attr("content")
             ?: ""
-        val poster = document.selectFirst("meta[property=og:image]")?.attr("content")
-            ?.takeIf { publicHttps(it) }
+        // Prefer the series artwork, including relative and lazy-loaded URLs.
+        // Avoid placeholder images and leave the playback path unchanged.
+        val poster = sequenceOf(
+            document.selectFirst("meta[property=og:image]")?.absUrl("content"),
+            document.selectFirst("meta[name=twitter:image]")?.absUrl("content"),
+            document.selectFirst("meta[property=twitter:image]")?.absUrl("content"),
+            document.selectFirst("article img, .entry-content img, .post img, .poster img")?.absUrl("data-src"),
+            document.selectFirst("article img, .entry-content img, .post img, .poster img")?.absUrl("data-original"),
+            document.selectFirst("article img, .entry-content img, .post img, .poster img")?.absUrl("src")
+        ).filterNotNull().map { it.trim() }
+            .firstOrNull { publicHttps(it) && !it.contains("placeholder", ignoreCase = true) }
         val listings = parseEpisodes(document)
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
