@@ -1,7 +1,7 @@
-version = 8
+version = 9
 
 cloudstream {
-    description = "14 Blender Open Movie titles, official artwork, duration and quality labels"
+    description = "Improved title matching, native series results and HLS/MP4 playback choices"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")

@@ -283,7 +283,12 @@ class FreeCinemaProvider : MainAPI() {
     ): Boolean {
         val film = films.firstOrNull { it.title == data } ?: return false
         val links = findRealLinks(film)
-        for (item in links.sortedByDescending { it.quality }.take(5)) {
+        // Keep adaptive HLS available even when multiple MP4 renditions are present.
+        // MP4 files remain selectable fallbacks if the device cannot play HLS.
+        val preferred = links.filter { it.type == ExtractorLinkType.M3U8 }.take(1) +
+            links.filter { it.type == ExtractorLinkType.VIDEO }
+                .sortedByDescending { it.quality }.take(4)
+        for (item in preferred) {
             callback(newExtractorLink(
                 source = name,
                 name = film.title + " - Blender " +

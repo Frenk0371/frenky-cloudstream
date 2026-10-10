@@ -1,4 +1,4 @@
-# Frenky CloudStream — Beta 8
+# Frenky CloudStream — Beta 9
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
@@ -13,7 +13,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 8 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 9 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -21,7 +21,7 @@ La voce **Frenky - Test Player** contiene ora tre clip di prova indipendenti: **
 
 L'esperimento è volutamente separato dai sei siti di catalogo: per questi ultimi **la ricerca rimane solo informativa** e la scritta «Prossimamente» persiste; non vengono ricavati link video né aggirati blocchi o DRM.
 
-## Frenky Cinema Libero (Beta 8)
+## Frenky Cinema Libero (Beta 9)
 
 La Beta 6 conteneva collegamenti MP4 costruiti da UUID non verificati: per questo alcuni film, incluso Sintel, hanno restituito ERROR_CODE_IO_BAD_HTTP_STATUS (2004). La versione 7 ha eliminato **tutti** gli URL MP4 e gli UUID ipotizzati dal codice.
 
@@ -29,7 +29,11 @@ La sorgente comprende 14 titoli di opere Blender come catalogo potenziale. Quand
 
 **La presenza del titolo nella schermata non garantisce che la copia video sia presente sul server.** Se la ricerca dell'API non trova un film disponibile, CloudStream non riceve alcun link. Anche i link ufficiali ottenuti dall'API dovranno essere verificati sul tablet.
 
-### Miglioramenti Beta 8
+### Miglioramenti Beta 9
+
+- **Ricerca dei cataloghi più accurata**: normalizzazione degli articoli («The Sentinel»/«Sentinel»), dell'anno e delle varianti di punteggiatura; corrispondenza su parole complete, meno falsi positivi e tentativo di ricerca alternativa quando il titolo non compare.
+- **Risultati delle serie riconosciuti correttamente** da CloudStream come serie, non film con tipo modificato.
+- **Riproduzione dei film Blender**: selezione di una playlist HLS quando presente, più fino a quattro alternative MP4; tutte restano limitate all'API ufficiale. Nessun collegamento video viene ricavato dai siti di terzi.
 
 - **Locandine e durata** ottenute dalle risposte dell'API pubblica di Blender quando presenti. Se il server non risponde, il titolo resta visualizzato senza poster.
 - **Ricerca italiana** per titolo, anno e parole descrittive; la schermata iniziale conserva l'elenco dei film.
@@ -50,7 +54,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 8 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 8** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 9 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 9** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 
