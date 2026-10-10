@@ -115,7 +115,7 @@ internal object ManualMediaBrowser {
                         view?.requestFocus()
                     }
                 }
-                browser.webViewClient = object : WebViewClient() {
+                // Some tablet WebViews render a blank frame until the screen wakes.\n                // Request redraws after navigation without reloading the page,\n                // so CAPTCHA state, cookies and playback handling stay intact.\n                fun refreshRendering(view: WebView?) {\n                    view ?: return\n                    view.post { view.invalidate() }\n                    view.postDelayed({ view.invalidate() }, 350L)\n                    view.postDelayed({ view.invalidate() }, 1200L)\n                }\n\n                browser.webViewClient = object : WebViewClient() {\n                    override fun onPageFinished(view: WebView?, url: String?) {\n                        super.onPageFinished(view, url)\n                        refreshRendering(view)\n                    }\n\n                    override fun onPageCommitVisible(view: WebView?, url: String?) {\n                        super.onPageCommitVisible(view, url)\n                        refreshRendering(view)\n                    }
                     override fun shouldOverrideUrlLoading(
                         view: WebView?, request: WebResourceRequest?
                     ): Boolean {
