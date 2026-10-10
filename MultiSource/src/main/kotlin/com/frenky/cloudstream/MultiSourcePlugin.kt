@@ -8,6 +8,7 @@ import com.lagradost.cloudstream3.plugins.Plugin
 class MultiSourcePlugin : Plugin() {
     override fun load(context: Context) {
         registerMainAPI(AuthorizedDemoProvider())
+        registerMainAPI(AuthorizedSeriesProvider())
         registerMainAPI(FreeCinemaProvider())
         SourceList.all.forEach { source ->
             registerMainAPI(ConfigurableSourceProvider(source))

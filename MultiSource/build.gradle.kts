@@ -1,7 +1,7 @@
-version = 9
+version = 10
 
 cloudstream {
-    description = "Improved title matching, native series results and HLS/MP4 playback choices"
+    description = "Native MP4/HLS series episode playback with configurable authorized catalogue"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")

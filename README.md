@@ -1,4 +1,4 @@
-# Frenky CloudStream — Beta 9
+# Frenky CloudStream — Beta 10
 
 Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede informative)** e **6 domini monitorati**.
 
@@ -13,7 +13,7 @@ Repository CloudStream personale con **4 cataloghi ricercabili (titoli e schede 
 | AltaDefinizione | Non ancora integrata | I percorsi testati restituivano la homepage |
 | StreamingCommunity | Non ancora integrata | La ricerca richiede JavaScript |
 
-**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 9 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
+**Importante:** la ricerca è stata verificata con sonde HTTP pubbliche. Non è stata ancora collaudata manualmente su Fire TV o tablet Android. La versione Beta 10 **non implementa l'estrazione né la riproduzione dei film e delle puntate dai cataloghi di terzi**, e non garantisce che ogni ricerca trovi risultati. Nessuna autorizzazione alla distribuzione dei contenuti dei siti è stata verificata.
 
 ## Collaudo del lettore integrato (Beta 5)
 
@@ -44,6 +44,14 @@ La sorgente comprende 14 titoli di opere Blender come catalogo potenziale. Quand
 
 La sorgente **Frenky - Test Player** già collaudata rimane intatta; Eurostream, CB01 e le altre fonti restano metadata-only, senza estrazione video.
 
+## Nuovo (Beta 10): episodi realmente riproducibili con fonti autorizzate
+
+La sorgente **Frenky - Episodi autorizzati** contiene un vero elenco di stagioni e puntate e implementa `loadLinks()` per flussi diretti MP4 e HLS. I link e i sottotitoli provengono dal registro GitHub [config/authorized-series.json](config/authorized-series.json), modificabile senza ricompilare (aggiornamento con cache di due minuti).
+
+Nel registro iniziale sono presenti tre **clip dimostrative liberamente condivisibili** per verificare la selezione delle puntate e il player CloudStream. Per aggiungere una propria serie occorrono flussi con autorizzazione alla riproduzione e URL HTTPS diretti MP4 o M3U8. Supportati sottotitoli diretti SRT/VTT e più qualità per episodio.
+
+**Limite:** Eurostreaming rimane una sorgente di schede informative. Nessun estrattore di video da servizi di terzi o bypass di accesso/DRM è stato integrato.
+
 ## Installazione
 
 CloudStream → **Impostazioni → Estensioni → Aggiungi repository**.
@@ -54,7 +62,7 @@ Incolla:
 https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/main/repo.json
 ```
 
-Installa la voce **MultiSource** (beta). La versione 9 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 9** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
+Installa la voce **MultiSource** (beta). La versione 10 rende le fonti selezionabili nel menu principale anche se non esiste ancora un catalogo iniziale; dopo aver scelto la sorgente usa **Cerca** per cercare titoli. La pagina iniziale resta volutamente vuota. Se era già installata, verifica di aver aggiornato a **versione 10** dopo il completamento della [build GitHub Actions](https://github.com/Frenk0371/frenky-cloudstream/actions/workflows/build.yml).
 
 Manifest: [repo.json](repo.json) · [plugins.json](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/plugins.json) · [plugin compilato](https://raw.githubusercontent.com/Frenk0371/frenky-cloudstream/builds/MultiSource.cs3).
 

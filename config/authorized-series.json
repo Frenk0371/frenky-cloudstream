@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "notes": "Add only media you are legally authorized to distribute or access. Direct HTTPS MP4/HLS streams only.",
+  "series": [
+    {
+      "id": "demo",
+      "title": "Frenky - Episodi demo (3 clip)",
+      "description": "Tre filmati di test liberamente condivisibili per provare puntate e player. Non sono episodi di serie TV commerciali.",
+      "episodes": [
+        {
+          "season": 1,
+          "episode": 1,
+          "title": "Flower (MDN, CC0)",
+          "streams": [
+            {
+              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+              "type": "mp4"
+            }
+          ]
+        },
+        {
+          "season": 1,
+          "episode": 2,
+          "title": "Big Buck Bunny (W3Schools)",
+          "streams": [
+            {
+              "url": "https://www.w3schools.com/html/mov_bbb.mp4",
+              "type": "mp4"
+            }
+          ]
+        },
+        {
+          "season": 1,
+          "episode": 3,
+          "title": "Big Buck Bunny (10 sec)",
+          "streams": [
+            {
+              "url": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4",
+              "type": "mp4",
+              "quality": 720
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
