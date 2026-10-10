@@ -14,6 +14,8 @@ class MultiSourcePlugin : Plugin() {
         SourceList.all.forEach { source ->
             if (source.id == "eurostream") {
                 registerMainAPI(EurostreamEpisodeProvider(source, context as? Activity))
+            } else if (source.id == "cb01") {
+                registerMainAPI(CB01Provider(source))
             } else {
                 registerMainAPI(ConfigurableSourceProvider(source))
             }
