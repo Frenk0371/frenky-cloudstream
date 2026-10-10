@@ -89,6 +89,18 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
             .take(3)
     }
 
+    private val recentPosters = LinkedHashMap<String, String>()
+
+    fun posterFor(url: String): String? = synchronized(recentPosters) { recentPosters[url] }
+
+    private fun rememberPoster(url: String, poster: String?) {
+        if (poster.isNullOrBlank()) return
+        synchronized(recentPosters) {
+            recentPosters[url] = poster
+            while (recentPosters.size > 100) recentPosters.remove(recentPosters.keys.first())
+        }
+    }
+
     private data class CatalogueHit(
         val title: String,
         val url: String,
@@ -141,6 +153,7 @@ class ConfigurableSourceProvider(private val source: Source) : MainAPI() {
                 val score = titleScore(query, title)
                 if (score < 60) continue
                 val poster = PosterFinder.fromSearchCard(anchor, card)
+                rememberPoster(url, poster)
                 val item = CatalogueHit(title, url, poster, score)
                 if (hits[url] == null || hits[url]!!.score < score) hits[url] = item
             }
