@@ -1,7 +1,7 @@
-version = 27
+version = 28
 
 cloudstream {
-    description = "Software WebView rendering test for CAPTCHA visibility"
+    description = "Manual WebView refresh button for CAPTCHA display"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
