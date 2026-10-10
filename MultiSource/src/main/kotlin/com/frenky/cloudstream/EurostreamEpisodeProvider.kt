@@ -243,7 +243,7 @@ class EurostreamEpisodeProvider(private val source: Source) : MainAPI() {
                     if (listing.videoPages.isEmpty()) " (nessun server individuato)" else ""
                 season = listing.id.season
                 episode = listing.id.number
-                description = episodeDetails
+                this.description = episodeDetails
             }, fix = false)
         }
         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
