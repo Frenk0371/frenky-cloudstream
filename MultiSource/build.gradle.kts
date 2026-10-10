@@ -1,7 +1,7 @@
-version = 41
+version = 42
 
 cloudstream {
-    description = "Rebuild v41 with StreamingCommunity detail-page fix"
+    description = "Eurostream only; remove duplicate catalogue sources"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
