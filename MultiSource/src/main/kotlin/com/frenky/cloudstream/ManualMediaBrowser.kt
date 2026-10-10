@@ -77,6 +77,11 @@ internal object ManualMediaBrowser {
                     isFocusableInTouchMode = true
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
+                    settings.builtInZoomControls = true
+                    settings.displayZoomControls = false
+                    settings.setSupportZoom(true)
+                    settings.useWideViewPort = false
+                    settings.loadWithOverviewMode = false
                     settings.allowFileAccess = false
                     settings.allowContentAccess = false
                     settings.setSupportMultipleWindows(false)
@@ -165,10 +170,27 @@ internal object ManualMediaBrowser {
                         return null // Let the browser perform the actual request.
                     }
                 }
+                val zoomControls = LinearLayout(activity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    val minus = Button(activity).apply {
+                        text = "−"
+                        contentDescription = "Riduci sito"
+                        setOnClickListener { browser.zoomOut() }
+                    }
+                    val plus = Button(activity).apply {
+                        text = "+"
+                        contentDescription = "Ingrandisci sito"
+                        setOnClickListener { browser.zoomIn() }
+                    }
+                    addView(minus, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                    addView(plus, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+                }
                 layout.addView(status, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(browser, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+                layout.addView(zoomControls, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
                 layout.addView(accept, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
 
