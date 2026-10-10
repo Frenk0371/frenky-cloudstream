@@ -11,7 +11,11 @@ class MultiSourcePlugin : Plugin() {
         registerMainAPI(AuthorizedSeriesProvider())
         registerMainAPI(FreeCinemaProvider())
         SourceList.all.forEach { source ->
-            registerMainAPI(ConfigurableSourceProvider(source))
+            if (source.id == "eurostream") {
+                registerMainAPI(EurostreamEpisodeProvider(source))
+            } else {
+                registerMainAPI(ConfigurableSourceProvider(source))
+            }
         }
     }
 }

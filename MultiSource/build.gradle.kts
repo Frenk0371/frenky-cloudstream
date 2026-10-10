@@ -1,7 +1,7 @@
-version = 10
+version = 11
 
 cloudstream {
-    description = "Native MP4/HLS series episode playback with configurable authorized catalogue"
+    description = "Eurostream native episode indexing and standard CloudStream player extraction"
     authors = listOf("Frenky")
     status = 3
     tvTypes = listOf("Movie", "TvSeries")
