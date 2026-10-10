@@ -5,6 +5,8 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.os.Build
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.webkit.WebChromeClient
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -66,6 +68,8 @@ internal object ManualMediaBrowser {
                     isEnabled = false
                 }
                 val browser = WebView(activity).apply {
+                    isFocusable = true
+                    isFocusableInTouchMode = true
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
                     settings.allowFileAccess = false
@@ -88,6 +92,11 @@ internal object ManualMediaBrowser {
                     dialog.dismiss()
                 }
 
+                browser.webChromeClient = object : WebChromeClient() {
+                    override fun onRequestFocus(view: WebView?) {
+                        view?.requestFocus()
+                    }
+                }
                 browser.webViewClient = object : WebViewClient() {
                     override fun shouldOverrideUrlLoading(
                         view: WebView?, request: WebResourceRequest?
@@ -140,6 +149,8 @@ internal object ManualMediaBrowser {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
+                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+                browser.requestFocus()
                 browser.loadUrl(initialUrl)
             }
         }
