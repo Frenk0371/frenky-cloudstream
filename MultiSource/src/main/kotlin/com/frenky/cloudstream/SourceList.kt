@@ -12,6 +12,10 @@ data class Source(
 
 object SourceList {
     val all = listOf(
-        Source("eurostream", "Eurostream", "https://eurostream.pics/", SearchMode.WORDPRESS, true)
+        Source("eurostream", "Eurostream", "https://eurostream.pics/", SearchMode.WORDPRESS, true),
+        // Experimental metadata-only providers; playback is not yet implemented.
+        Source("filmpertutti", "FilmPerTutti (test)", "https://film-pertutti.fit/", SearchMode.WORDPRESS),
+        Source("casacinema", "CasaCinema (test)", "https://casa-cinema.boats/", SearchMode.WORDPRESS),
+        Source("guardoserie_new", "GuardoSerie (test)", "https://guardoseries.sbs/", SearchMode.WORDPRESS, true)
     )
 }
