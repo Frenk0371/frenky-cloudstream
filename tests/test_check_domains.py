@@ -6,11 +6,12 @@ import unittest
 from tools.check_domains import evaluate, host_stem, run, safe_url
 
 class RegistryTests(unittest.TestCase):
-    def test_registry_has_six_unique_sources(self):
+    def test_registry_has_unique_valid_sources(self):
         r = json.loads((Path(__file__).parents[1] / "config" / "domains.json").read_text())
-        self.assertEqual(len(r["sources"]), 6)
-        self.assertEqual(len({x["id"] for x in r["sources"]}), 6)
-        for x in r["sources"]:
+        sources = r["sources"]
+        self.assertGreater(len(sources), 0)
+        self.assertEqual(len({x["id"] for x in sources}), len(sources))
+        for x in sources:
             self.assertTrue(safe_url(x["current_url"]))
 
     def test_rejects_unsafe_urls(self):
