@@ -1,18 +1,19 @@
 {
-  "checked_at_utc": "2026-10-10T16:54:43+00:00",
-  "automatic_updates": [],
+  "checked_at_utc": "2026-10-18T09:43:26+00:00",
+  "automatic_updates": [
+    {
+      "id": "guardaserie",
+      "previous": "https://guardaseriex.click/",
+      "new": "https://guardaseriex.wiki/"
+    },
+    {
+      "id": "streamingcommunity",
+      "previous": "https://streamingcommunityz.rip/",
+      "new": "https://streamingcommunityz.shiksha/"
+    }
+  ],
   "needs_review": [],
   "results": [
-    {
-      "id": "altadefinizione",
-      "name": "AltaDefinizione",
-      "checked_url": "https://altadefinizionex.surf/",
-      "status": "ok",
-      "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
-    },
     {
       "id": "eurostream",
       "name": "Eurostream",
@@ -29,9 +30,15 @@
       "checked_url": "https://guardaseriex.click/",
       "status": "ok",
       "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://guardaseriex.wiki/",
+      "redirects": [
+        {
+          "from": "https://guardaseriex.click/",
+          "to": "https://guardaseriex.wiki/",
+          "status": 301
+        }
+      ]
     },
     {
       "id": "streamingcommunity",
@@ -39,29 +46,15 @@
       "checked_url": "https://streamingcommunityz.rip/",
       "status": "ok",
       "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
-    },
-    {
-      "id": "ilgenio",
-      "name": "Il Genio dello Streaming",
-      "checked_url": "https://il-geniodellostreaming.vip/",
-      "status": "ok",
-      "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
-    },
-    {
-      "id": "cb01",
-      "name": "CB01",
-      "checked_url": "https://cbin99.mobi/casa/",
-      "status": "ok",
-      "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://streamingcommunityz.shiksha/",
+      "redirects": [
+        {
+          "from": "https://streamingcommunityz.rip/",
+          "to": "https://streamingcommunityz.shiksha/",
+          "status": 301
+        }
+      ]
     }
   ]
 }
