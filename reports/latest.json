@@ -1,17 +1,6 @@
 {
-  "checked_at_utc": "2026-10-18T09:43:26+00:00",
-  "automatic_updates": [
-    {
-      "id": "guardaserie",
-      "previous": "https://guardaseriex.click/",
-      "new": "https://guardaseriex.wiki/"
-    },
-    {
-      "id": "streamingcommunity",
-      "previous": "https://streamingcommunityz.rip/",
-      "new": "https://streamingcommunityz.shiksha/"
-    }
-  ],
+  "checked_at_utc": "2026-10-19T10:42:12+00:00",
+  "automatic_updates": [],
   "needs_review": [],
   "results": [
     {
@@ -27,34 +16,22 @@
     {
       "id": "guardaserie",
       "name": "GuardaSerie",
-      "checked_url": "https://guardaseriex.click/",
+      "checked_url": "https://guardaseriex.wiki/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://guardaseriex.wiki/",
-      "redirects": [
-        {
-          "from": "https://guardaseriex.click/",
-          "to": "https://guardaseriex.wiki/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     },
     {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.rip/",
+      "checked_url": "https://streamingcommunityz.shiksha/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://streamingcommunityz.shiksha/",
-      "redirects": [
-        {
-          "from": "https://streamingcommunityz.rip/",
-          "to": "https://streamingcommunityz.shiksha/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     }
   ]
 }
