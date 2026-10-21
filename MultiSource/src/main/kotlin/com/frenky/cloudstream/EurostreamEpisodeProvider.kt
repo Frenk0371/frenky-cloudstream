@@ -221,7 +221,15 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             currentDomain.trimEnd('/') + (oldUri.rawPath?.takeIf { it.startsWith("/") } ?: "/") +
                 (oldUri.rawQuery?.let { "?$it" } ?: "")
         } else url
-        val document = Jsoup.parse(html(pageUrl), pageUrl)
+        val pageHtml = html(pageUrl)
+        if (pageHtml.isBlank()) {
+            throw IllegalStateException(
+                "Eurostream: pagina non raggiungibile o risposta HTTP non valida su " +
+                    (officialHost ?: "dominio sconosciuto") +
+                    ". Verifica il sito nel browser e riprova."
+            )
+        }
+        val document = Jsoup.parse(pageHtml, pageUrl)
         val title = document.selectFirst("h1")?.text()?.trim()
             ?.takeIf { it.isNotBlank() }
             ?: document.selectFirst("meta[property=og:title]")?.attr("content")
@@ -231,6 +239,28 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             ?: ""
         val artwork = catalogue.posterFor(url) ?: PosterFinder.fromDocument(document, title)
         val listings = parseEpisodes(document)
+        if (listings.isEmpty()) {
+            val pageTitle = document.title().lowercase(Locale.ROOT)
+            val textSample = document.body()?.text()?.take(1500).orEmpty().lowercase(Locale.ROOT)
+            val challenge = hasHumanChallenge(pageHtml) ||
+                listOf("just a moment", "checking your browser", "access denied",
+                    "verifica che sei umano", "attention required").any {
+                    pageTitle.contains(it) || textSample.contains(it)
+                }
+            val episodeMarkers = episodeRegex.containsMatchIn(document.body()?.text().orEmpty()) ||
+                simpleEpisodeRegex.containsMatchIn(document.body()?.text().orEmpty())
+            val reason = when {
+                challenge -> "Il sito richiede una verifica nel browser."
+                document.selectFirst("article, main, .entry-content, .post-content") == null ->
+                    "La risposta non contiene la scheda della serie."
+                episodeMarkers -> "La pagina contiene riferimenti agli episodi, ma il parser non li riconosce."
+                else -> "La pagina è stata caricata, ma non contiene episodi riconoscibili."
+            }
+            Log.w("FrenkyCloudStream", "Eurostream: zero episodes; challenge=$challenge " +
+                "markers=$episodeMarkers title=" + document.title().take(90))
+            throw IllegalStateException("Eurostream: " + reason +
+                " Apri la scheda sul sito per verificare.")
+        }
         val seasonCount = listings.map { it.id.season }.distinct().size
         val linkedCount = listings.count { it.videoPages.isNotEmpty() }
         val episodes = listings.map { listing ->
