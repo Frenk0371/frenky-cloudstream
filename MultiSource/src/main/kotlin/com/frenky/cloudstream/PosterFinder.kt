@@ -9,7 +9,7 @@ import java.net.URI
  * Does not guess poster URLs or use unrelated sidebar / advertisement images.
  */
 object PosterFinder {
-    private val attributes = listOf("data-src", "data-original", "data-lazy-src", "data-srcset", "srcset", "src")
+    private val attributes = listOf("data-frenky-current-src", "data-src", "data-original", "data-lazy-src", "data-srcset", "srcset", "src")
 
     private fun usable(raw: String): Boolean = try {
         val uri = URI(raw)
