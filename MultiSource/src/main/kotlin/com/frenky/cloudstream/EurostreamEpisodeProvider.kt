@@ -210,10 +210,18 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
         val currentDomain = DomainRegistry.resolve(source.id, source.fallbackUrl)
         val itemHost = runCatching { URI(url).host?.lowercase(Locale.ROOT)?.removePrefix("www.") }.getOrNull()
         val officialHost = runCatching { URI(currentDomain).host?.lowercase(Locale.ROOT)?.removePrefix("www.") }.getOrNull()
-        if (!publicHttps(url) || itemHost != officialHost)
+        // Older catalogue entries may still point to the previous Eurostream domain.
+        // Remap only that known host; reject unrelated hosts as before.
+        val legacyHost = "eurostream.pics"
+        if (!publicHttps(url) || (itemHost != officialHost && itemHost != legacyHost))
             throw IllegalArgumentException("Scheda fuori dal dominio Eurostream")
 
-        val document = Jsoup.parse(html(url), url)
+        val pageUrl = if (itemHost == legacyHost && officialHost != legacyHost) {
+            val oldUri = URI(url)
+            currentDomain.trimEnd('/') + (oldUri.rawPath?.takeIf { it.startsWith("/") } ?: "/") +
+                (oldUri.rawQuery?.let { "?$it" } ?: "")
+        } else url
+        val document = Jsoup.parse(html(pageUrl), pageUrl)
         val title = document.selectFirst("h1")?.text()?.trim()
             ?.takeIf { it.isNotBlank() }
             ?: document.selectFirst("meta[property=og:title]")?.attr("content")
