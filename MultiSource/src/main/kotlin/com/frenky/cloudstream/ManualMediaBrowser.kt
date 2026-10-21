@@ -69,10 +69,15 @@ internal object ManualMediaBrowser {
                     text = "Completa personalmente l'eventuale verifica del sito. Quando la pagina della serie è visibile, premi Leggi episodi."
                     textSize = 14f
                 }
-                val confirm = Button(activity).apply { text = "Leggi episodi" }
+                val confirm = Button(activity).apply {
+                    text = "Leggi episodi"
+                    isEnabled = false
+                }
                 val browser = WebView(activity).apply {
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
+                    setBackgroundColor(android.graphics.Color.WHITE)
+                    setLayerType(android.view.View.LAYER_TYPE_SOFTWARE, null)
                     settings.allowFileAccess = false
                     settings.allowContentAccess = false
                     settings.setSupportMultipleWindows(false)
@@ -80,6 +85,21 @@ internal object ManualMediaBrowser {
                     settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
                     if (Build.VERSION.SDK_INT >= 26) settings.safeBrowsingEnabled = true
                     webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
+                            view?.post { view.invalidate() }
+                            view?.postDelayed({ view.invalidate() }, 350L)
+                            view?.postDelayed({ view.invalidate() }, 1200L)
+                            instructions.text = "Pagina caricata. Completa eventuali verifiche e controlla che siano visibili le stagioni."
+                            confirm.isEnabled = true
+                        }
+                        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: android.webkit.WebResourceError?) {
+                            super.onReceivedError(view, request, error)
+                            if (request?.isForMainFrame == true) {
+                                instructions.text = "Caricamento fallito: controlla la connessione e riprova."
+                                confirm.isEnabled = false
+                            }
+                        }
                         override fun shouldOverrideUrlLoading(
                             view: WebView?, request: WebResourceRequest?
                         ): Boolean {
@@ -88,7 +108,19 @@ internal object ManualMediaBrowser {
                         }
                     }
                 }
+                val refresh = Button(activity).apply {
+                    text = "Aggiorna visualizzazione"
+                    setOnClickListener {
+                        browser.visibility = android.view.View.INVISIBLE
+                        browser.post {
+                            browser.visibility = android.view.View.VISIBLE
+                            browser.requestLayout()
+                            browser.invalidate()
+                        }
+                    }
+                }
                 layout.addView(instructions)
+                layout.addView(refresh)
                 layout.addView(browser, LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
                 layout.addView(confirm)
@@ -111,7 +143,11 @@ internal object ManualMediaBrowser {
                         val html = runCatching {
                             org.json.JSONTokener(encoded).nextValue() as? String
                         }.getOrNull()
-                        if (html.isNullOrBlank() || html.length > 1_500_000) {
+                        if (html.isNullOrBlank() || html.length > 1_500_000 ||
+                            listOf("cf-turnstile", "checking your browser", "verifica di sicurezza",
+                                "stiamo verificando", "just a moment").any { marker ->
+                                html.contains(marker, ignoreCase = true)
+                            }) {
                             instructions.text = "Pagina non disponibile. Completa la verifica e riprova."
                         } else {
                             finish(html)
@@ -127,10 +163,16 @@ internal object ManualMediaBrowser {
                     activity.runOnUiThread { if (dialog.isShowing) dialog.dismiss() }
                 }
                 dialog.show()
+                dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
                 dialog.window?.setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
+                dialog.window?.clearFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                        WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+                )
+                browser.requestFocus()
                 browser.loadUrl(pageUrl)
             }
         }
