@@ -59,7 +59,44 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
 
     override suspend fun search(query: String): List<SearchResponse> {
         mainUrl = DomainRegistry.resolve(source.id, source.fallbackUrl)
-        return catalogue.search(query)
+        val ordinary = catalogue.search(query)
+        if (ordinary.isNotEmpty()) return ordinary
+        val activity = browserActivity.get() ?: return ordinary
+        if (activity.isFinishing || activity.isDestroyed) return ordinary
+        val searchTerm = query.trim().take(80)
+        if (searchTerm.length < 2) return ordinary
+        val searchUrl = mainUrl.trimEnd('/') + "/?s=" +
+            java.net.URLEncoder.encode(searchTerm, "UTF-8")
+        val verifiedHtml = ManualMediaBrowser.readVerifiedPage(
+            activity, searchUrl, requireEpisodes = false
+        ) ?: return ordinary
+        val expectedHost = runCatching {
+            URI(mainUrl).host?.lowercase(Locale.ROOT)?.removePrefix("www.")
+        }.getOrNull() ?: return ordinary
+        val expectedTitle = searchTerm.lowercase(Locale.ROOT)
+            .replace(Regex("""^(the|il|lo|la)\\s+"""), "").trim()
+        return Jsoup.parse(verifiedHtml, searchUrl).select("a[href]")
+            .mapNotNull { anchor ->
+                val link = anchor.absUrl("href")
+                val uri = runCatching { URI(link) }.getOrNull() ?: return@mapNotNull null
+                if (!uri.scheme.equals("https", true) ||
+                    uri.host?.lowercase(Locale.ROOT)?.removePrefix("www.") != expectedHost ||
+                    uri.path.isNullOrBlank() || uri.path == "/") return@mapNotNull null
+                val card = anchor.closest("article, .post, .item, .result, .search-result")
+                val title = listOf(
+                    anchor.attr("title"), anchor.text(),
+                    card?.selectFirst("h1,h2,h3,h4,.entry-title,.post-title")?.text().orEmpty(),
+                    anchor.selectFirst("img")?.attr("alt").orEmpty()
+                ).firstOrNull { candidate ->
+                    candidate.lowercase(Locale.ROOT)
+                        .replace(Regex("""^(the|il|lo|la)\\s+"""), "")
+                        .contains(expectedTitle) && candidate.length in 3..160
+                } ?: return@mapNotNull null
+                newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+                    posterUrl = anchor.selectFirst("img[src]")?.absUrl("src")
+                        ?: card?.selectFirst("img[src]")?.absUrl("src")
+                }
+            }.distinctBy { it.url }.take(40)
     }
 
     private fun publicHttps(raw: String): Boolean = try {
