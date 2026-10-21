@@ -94,7 +94,6 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
                 } ?: return@mapNotNull null
                 newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
                     posterUrl = PosterFinder.fromSearchCard(anchor, card)
-                        ?: card?.let { PosterFinder.fromDocument(Jsoup.parse(it.outerHtml(), searchUrl), title) }
                 }
             }.distinctBy { it.url }.take(40)
     }
