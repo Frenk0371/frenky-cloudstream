@@ -221,7 +221,13 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
             currentDomain.trimEnd('/') + (oldUri.rawPath?.takeIf { it.startsWith("/") } ?: "/") +
                 (oldUri.rawQuery?.let { "?$it" } ?: "")
         } else url
-        val pageHtml = html(pageUrl)
+        var pageHtml = html(pageUrl)
+        if (pageHtml.isBlank()) {
+            val activity = browserActivity.get()
+            if (activity != null && !activity.isFinishing) {
+                pageHtml = ManualMediaBrowser.readVerifiedPage(activity, pageUrl).orEmpty()
+            }
+        }
         if (pageHtml.isBlank()) {
             throw IllegalStateException(
                 "Eurostream: pagina non raggiungibile o risposta HTTP non valida su " +
