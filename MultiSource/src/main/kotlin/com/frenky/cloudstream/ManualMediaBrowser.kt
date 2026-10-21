@@ -66,13 +66,15 @@ internal object ManualMediaBrowser {
                     setPadding(8, 8, 8, 8)
                 }
                 val instructions = TextView(activity).apply {
-                    text = "Completa personalmente l'eventuale verifica del sito. Quando la pagina della serie è visibile, premi Leggi episodi."
+                    text = "Completa personalmente l'eventuale verifica del sito. Quando gli episodi sono visibili, il caricamento prosegue automaticamente."
                     textSize = 14f
                 }
                 val confirm = Button(activity).apply {
                     text = "Leggi episodi"
                     isEnabled = false
                 }
+                var inspectPage: () -> Unit = {}
+                var completed = false
                 val browser = WebView(activity).apply {
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
@@ -92,6 +94,9 @@ internal object ManualMediaBrowser {
                             view?.postDelayed({ view.invalidate() }, 1200L)
                             instructions.text = "Pagina caricata. Completa eventuali verifiche e controlla che siano visibili le stagioni."
                             confirm.isEnabled = true
+                            view?.postDelayed({ if (!completed) inspectPage() }, 800L)
+                            view?.postDelayed({ if (!completed) inspectPage() }, 3000L)
+                            view?.postDelayed({ if (!completed) inspectPage() }, 6000L)
                         }
                         override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: android.webkit.WebResourceError?) {
                             super.onReceivedError(view, request, error)
@@ -130,14 +135,14 @@ internal object ManualMediaBrowser {
                     if (continuation.isActive) continuation.resume(html)
                     dialog.dismiss()
                 }
-                confirm.setOnClickListener {
+                inspectPage = inspect@{
                     val actualHost = runCatching {
                         URI(browser.url).host?.lowercase(Locale.ROOT)?.removePrefix("www.")
                     }.getOrNull()
                     val expectedHost = URI(pageUrl).host?.lowercase(Locale.ROOT)?.removePrefix("www.")
                     if (actualHost != expectedHost) {
                         instructions.text = "Torna alla pagina originale della serie prima di continuare."
-                        return@setOnClickListener
+                        return@inspect
                     }
                     browser.evaluateJavascript("document.documentElement.outerHTML") { encoded ->
                         val html = runCatching {
@@ -149,11 +154,15 @@ internal object ManualMediaBrowser {
                                 html.contains(marker, ignoreCase = true)
                             }) {
                             instructions.text = "Pagina non disponibile. Completa la verifica e riprova."
+                        } else if (!Regex("""(?i)\b[0-9]{1,2}\s*[x×]\s*[0-9]{1,3}\b""").containsMatchIn(org.jsoup.Jsoup.parse(html).text())) {
+                            instructions.text = "Attendo gli episodi. Completa l'eventuale verifica del sito."
                         } else {
+                            completed = true
                             finish(html)
                         }
                     }
                 }
+                confirm.setOnClickListener { inspectPage() }
                 dialog.setOnDismissListener {
                     browser.stopLoading()
                     browser.destroy()
