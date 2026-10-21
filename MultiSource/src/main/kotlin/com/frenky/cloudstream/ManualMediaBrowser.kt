@@ -51,6 +51,90 @@ internal object ManualMediaBrowser {
         return path.endsWith(".m3u8") || path.endsWith(".mpd") || path.endsWith(".mp4")
     }
 
+    /**
+     * User-controlled page inspection after an ordinary, manual website check.
+     * No CAPTCHA automation, cookie export, or background challenge replay.
+     */
+    @SuppressLint("SetJavaScriptEnabled")
+    suspend fun readVerifiedPage(activity: Activity, pageUrl: String): String? =
+        withContext(Dispatchers.Main) {
+            if (!isPublicHttps(pageUrl) || activity.isFinishing ||
+                (Build.VERSION.SDK_INT >= 17 && activity.isDestroyed)) return@withContext null
+            suspendCancellableCoroutine { continuation ->
+                val layout = LinearLayout(activity).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(8, 8, 8, 8)
+                }
+                val instructions = TextView(activity).apply {
+                    text = "Completa personalmente l'eventuale verifica del sito. Quando la pagina della serie è visibile, premi Leggi episodi."
+                    textSize = 14f
+                }
+                val confirm = Button(activity).apply { text = "Leggi episodi" }
+                val browser = WebView(activity).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.allowFileAccess = false
+                    settings.allowContentAccess = false
+                    settings.setSupportMultipleWindows(false)
+                    settings.javaScriptCanOpenWindowsAutomatically = false
+                    settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                    if (Build.VERSION.SDK_INT >= 26) settings.safeBrowsingEnabled = true
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(
+                            view: WebView?, request: WebResourceRequest?
+                        ): Boolean {
+                            val target = request?.url?.toString() ?: return true
+                            return !isPublicHttps(target)
+                        }
+                    }
+                }
+                layout.addView(instructions)
+                layout.addView(browser, LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+                layout.addView(confirm)
+                val dialog = AlertDialog.Builder(activity).setView(layout)
+                    .setNegativeButton("Annulla") { d, _ -> d.dismiss() }.create()
+                fun finish(html: String?) {
+                    if (continuation.isActive) continuation.resume(html)
+                    dialog.dismiss()
+                }
+                confirm.setOnClickListener {
+                    val actualHost = runCatching {
+                        URI(browser.url).host?.lowercase(Locale.ROOT)?.removePrefix("www.")
+                    }.getOrNull()
+                    val expectedHost = URI(pageUrl).host?.lowercase(Locale.ROOT)?.removePrefix("www.")
+                    if (actualHost != expectedHost) {
+                        instructions.text = "Torna alla pagina originale della serie prima di continuare."
+                        return@setOnClickListener
+                    }
+                    browser.evaluateJavascript("document.documentElement.outerHTML") { encoded ->
+                        val html = runCatching {
+                            org.json.JSONTokener(encoded).nextValue() as? String
+                        }.getOrNull()
+                        if (html.isNullOrBlank() || html.length > 1_500_000) {
+                            instructions.text = "Pagina non disponibile. Completa la verifica e riprova."
+                        } else {
+                            finish(html)
+                        }
+                    }
+                }
+                dialog.setOnDismissListener {
+                    browser.stopLoading()
+                    browser.destroy()
+                    if (continuation.isActive) continuation.resume(null)
+                }
+                continuation.invokeOnCancellation {
+                    activity.runOnUiThread { if (dialog.isShowing) dialog.dismiss() }
+                }
+                dialog.show()
+                dialog.window?.setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                browser.loadUrl(pageUrl)
+            }
+        }
+
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun open(activity: Activity, initialUrl: String): SelectedMedia? =
         withContext(Dispatchers.Main) {
