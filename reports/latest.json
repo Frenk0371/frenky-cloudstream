@@ -1,15 +1,26 @@
 {
-  "checked_at_utc": "2026-10-21T10:04:34+00:00",
+  "checked_at_utc": "2026-10-21T19:57:51+00:00",
   "automatic_updates": [],
-  "needs_review": [],
+  "needs_review": [
+    {
+      "id": "eurostream",
+      "name": "Eurostream",
+      "checked_url": "https://eurostream.fun/",
+      "status": "blocked_or_error",
+      "http_code": 403,
+      "decision": "not_updated",
+      "suggested_url": null,
+      "redirects": []
+    }
+  ],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
-      "checked_url": "https://eurostream.pics/",
-      "status": "ok",
-      "http_code": 200,
-      "decision": "unchanged",
+      "checked_url": "https://eurostream.fun/",
+      "status": "blocked_or_error",
+      "http_code": 403,
+      "decision": "not_updated",
       "suggested_url": null,
       "redirects": []
     },
