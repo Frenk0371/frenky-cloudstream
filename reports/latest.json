@@ -1,71 +1,37 @@
 {
-  "checked_at_utc": "2026-10-20T09:59:15+00:00",
-  "automatic_updates": [
-    {
-      "id": "guardaserie",
-      "previous": "https://guardaseriex.wiki/",
-      "new": "https://guardaseriex.icu/"
-    },
-    {
-      "id": "streamingcommunity",
-      "previous": "https://streamingcommunityz.shiksha/",
-      "new": "https://streamingcommunityz.build/"
-    }
-  ],
-  "needs_review": [
-    {
-      "id": "eurostream",
-      "name": "Eurostream",
-      "checked_url": "https://eurostream.pics/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
-    }
-  ],
+  "checked_at_utc": "2026-10-21T10:04:34+00:00",
+  "automatic_updates": [],
+  "needs_review": [],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
       "checked_url": "https://eurostream.pics/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
+      "status": "ok",
+      "http_code": 200,
+      "decision": "unchanged",
       "suggested_url": null,
       "redirects": []
     },
     {
       "id": "guardaserie",
       "name": "GuardaSerie",
-      "checked_url": "https://guardaseriex.wiki/",
+      "checked_url": "https://guardaseriex.icu/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://guardaseriex.icu/",
-      "redirects": [
-        {
-          "from": "https://guardaseriex.wiki/",
-          "to": "https://guardaseriex.icu/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     },
     {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.shiksha/",
+      "checked_url": "https://streamingcommunityz.build/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://streamingcommunityz.build/",
-      "redirects": [
-        {
-          "from": "https://streamingcommunityz.shiksha/",
-          "to": "https://streamingcommunityz.build/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     }
   ]
 }
