@@ -56,7 +56,7 @@ internal object ManualMediaBrowser {
      * No CAPTCHA automation, cookie export, or background challenge replay.
      */
     @SuppressLint("SetJavaScriptEnabled")
-    suspend fun readVerifiedPage(activity: Activity, pageUrl: String): String? =
+    suspend fun readVerifiedPage(activity: Activity, pageUrl: String, requireEpisodes: Boolean = true): String? =
         withContext(Dispatchers.Main) {
             if (!isPublicHttps(pageUrl) || activity.isFinishing ||
                 (Build.VERSION.SDK_INT >= 17 && activity.isDestroyed)) return@withContext null
@@ -154,8 +154,10 @@ internal object ManualMediaBrowser {
                                 html.contains(marker, ignoreCase = true)
                             }) {
                             instructions.text = "Pagina non disponibile. Completa la verifica e riprova."
-                        } else if (!Regex("""(?i)\b[0-9]{1,2}\s*[x×]\s*[0-9]{1,3}\b""").containsMatchIn(org.jsoup.Jsoup.parse(html).text())) {
+                        } else if (requireEpisodes && !Regex("""(?i)\b[0-9]{1,2}\s*[x×]\s*[0-9]{1,3}\b""").containsMatchIn(org.jsoup.Jsoup.parse(html).text())) {
                             instructions.text = "Attendo gli episodi. Completa l'eventuale verifica del sito."
+                        } else if (!requireEpisodes && org.jsoup.Jsoup.parse(html).select("article, .post, .item, .result, .search-result").isEmpty()) {
+                            instructions.text = "Attendo i risultati della ricerca. Completa la verifica se richiesta."
                         } else {
                             completed = true
                             finish(html)
