@@ -144,7 +144,17 @@ internal object ManualMediaBrowser {
                         instructions.text = "Torna alla pagina originale della serie prima di continuare."
                         return@inspect
                     }
-                    browser.evaluateJavascript("document.documentElement.outerHTML") { encoded ->
+                    browser.evaluateJavascript(
+                        """(function() {
+                            document.querySelectorAll('img').forEach(function(img) {
+                                var source = img.currentSrc || img.src;
+                                if (source && /^https:\\/\\//i.test(source)) {
+                                    img.setAttribute('data-frenky-current-src', source);
+                                }
+                            });
+                            return document.documentElement.outerHTML;
+                        })()"""
+                    ) { encoded ->
                         val html = runCatching {
                             org.json.JSONTokener(encoded).nextValue() as? String
                         }.getOrNull()
