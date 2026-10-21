@@ -75,7 +75,7 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
         }.getOrNull() ?: return ordinary
         val expectedTitle = searchTerm.lowercase(Locale.ROOT)
             .replace(Regex("""^(the|il|lo|la)\\s+"""), "").trim()
-        return Jsoup.parse(verifiedHtml, searchUrl).select("a[href]")
+        val results = Jsoup.parse(verifiedHtml, searchUrl).select("a[href]")
             .mapNotNull { anchor ->
                 val link = anchor.absUrl("href")
                 val uri = runCatching { URI(link) }.getOrNull() ?: return@mapNotNull null
@@ -92,10 +92,20 @@ class EurostreamEpisodeProvider(private val source: Source, owner: Activity? = n
                         .replace(Regex("""^(the|il|lo|la)\\s+"""), "")
                         .contains(expectedTitle) && candidate.length in 3..160
                 } ?: return@mapNotNull null
-                newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
-                    posterUrl = PosterFinder.fromSearchCard(anchor, card)
-                }
-            }.distinctBy { it.url }.take(40)
+                Triple(title, link, PosterFinder.fromSearchCard(anchor, card))
+            }.distinctBy { it.second }.take(40)
+        return results.map { (title, link, cardPoster) ->
+            // Resolve missing artwork from each series page, never a fixed title image.
+            // Requests are bounded; Cloudflare-protected pages may still be unavailable.
+            val pagePoster = if (cardPoster == null) {
+                val page = html(link)
+                if (page.isNotBlank()) PosterFinder.fromDocument(Jsoup.parse(page, link), title)
+                else null
+            } else null
+            newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+                posterUrl = cardPoster ?: pagePoster
+            }
+        }
     }
 
     private fun publicHttps(raw: String): Boolean = try {
