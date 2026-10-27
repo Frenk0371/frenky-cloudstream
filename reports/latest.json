@@ -1,6 +1,17 @@
 {
-  "checked_at_utc": "2026-10-26T11:01:12+00:00",
-  "automatic_updates": [],
+  "checked_at_utc": "2026-10-27T10:29:26+00:00",
+  "automatic_updates": [
+    {
+      "id": "guardaserie",
+      "previous": "https://guardaseriex.icu/",
+      "new": "https://guardaseriex.best/"
+    },
+    {
+      "id": "streamingcommunity",
+      "previous": "https://streamingcommunityz.build/",
+      "new": "https://streamingcommunityz.day/"
+    }
+  ],
   "needs_review": [],
   "results": [
     {
@@ -19,9 +30,15 @@
       "checked_url": "https://guardaseriex.icu/",
       "status": "ok",
       "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://guardaseriex.best/",
+      "redirects": [
+        {
+          "from": "https://guardaseriex.icu/",
+          "to": "https://guardaseriex.best/",
+          "status": 301
+        }
+      ]
     },
     {
       "id": "streamingcommunity",
@@ -29,9 +46,15 @@
       "checked_url": "https://streamingcommunityz.build/",
       "status": "ok",
       "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://streamingcommunityz.day/",
+      "redirects": [
+        {
+          "from": "https://streamingcommunityz.build/",
+          "to": "https://streamingcommunityz.day/",
+          "status": 301
+        }
+      ]
     }
   ]
 }

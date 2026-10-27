@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-20T09:59:15+00:00",
+  "updated_at": "2026-10-27T10:29:26+00:00",
   "sources": [
     {
       "id": "eurostream",
@@ -15,14 +15,14 @@
       "id": "guardaserie",
       "name": "GuardaSerie",
       "original_url": "https://guardaseriex.click/",
-      "current_url": "https://guardaseriex.icu/",
+      "current_url": "https://guardaseriex.best/",
       "manual_aliases": []
     },
     {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
       "original_url": "https://streamingcommunityz.rip/",
-      "current_url": "https://streamingcommunityz.build/",
+      "current_url": "https://streamingcommunityz.day/",
       "manual_aliases": []
     }
   ]
