@@ -1,7 +1,18 @@
 {
-  "checked_at_utc": "2026-11-01T11:47:53+00:00",
+  "checked_at_utc": "2026-11-02T13:26:04+00:00",
   "automatic_updates": [],
-  "needs_review": [],
+  "needs_review": [
+    {
+      "id": "streamingcommunity",
+      "name": "StreamingCommunity",
+      "checked_url": "https://streamingcommunityz.day/",
+      "status": "blocked_or_error",
+      "http_code": 523,
+      "decision": "not_updated",
+      "suggested_url": null,
+      "redirects": []
+    }
+  ],
   "results": [
     {
       "id": "eurostream",
@@ -27,9 +38,9 @@
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
       "checked_url": "https://streamingcommunityz.day/",
-      "status": "ok",
-      "http_code": 200,
-      "decision": "unchanged",
+      "status": "blocked_or_error",
+      "http_code": 523,
+      "decision": "not_updated",
       "suggested_url": null,
       "redirects": []
     }
