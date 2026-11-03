@@ -1,18 +1,18 @@
 {
-  "checked_at_utc": "2026-11-02T13:26:04+00:00",
-  "automatic_updates": [],
-  "needs_review": [
+  "checked_at_utc": "2026-11-03T12:44:25+00:00",
+  "automatic_updates": [
+    {
+      "id": "guardaserie",
+      "previous": "https://guardaseriex.best/",
+      "new": "https://guardaseriex.art/"
+    },
     {
       "id": "streamingcommunity",
-      "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.day/",
-      "status": "blocked_or_error",
-      "http_code": 523,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
+      "previous": "https://streamingcommunityz.day/",
+      "new": "https://streamingcommunityz.boo/"
     }
   ],
+  "needs_review": [],
   "results": [
     {
       "id": "eurostream",
@@ -30,19 +30,31 @@
       "checked_url": "https://guardaseriex.best/",
       "status": "ok",
       "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://guardaseriex.art/",
+      "redirects": [
+        {
+          "from": "https://guardaseriex.best/",
+          "to": "https://guardaseriex.art/",
+          "status": 301
+        }
+      ]
     },
     {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
       "checked_url": "https://streamingcommunityz.day/",
-      "status": "blocked_or_error",
-      "http_code": 523,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
+      "status": "ok",
+      "http_code": 200,
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://streamingcommunityz.boo/",
+      "redirects": [
+        {
+          "from": "https://streamingcommunityz.day/",
+          "to": "https://streamingcommunityz.boo/",
+          "status": 301
+        }
+      ]
     }
   ]
 }
