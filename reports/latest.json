@@ -1,29 +1,17 @@
 {
-  "checked_at_utc": "2026-11-04T12:56:52+00:00",
-  "automatic_updates": [
-    {
-      "id": "eurostream",
-      "previous": "https://eurostream.fit/",
-      "new": "https://eurostream.one/"
-    }
-  ],
+  "checked_at_utc": "2026-11-05T13:08:09+00:00",
+  "automatic_updates": [],
   "needs_review": [],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
-      "checked_url": "https://eurostream.fit/",
+      "checked_url": "https://eurostream.one/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://eurostream.one/",
-      "redirects": [
-        {
-          "from": "https://eurostream.fit/",
-          "to": "https://eurostream.one/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     },
     {
       "id": "guardaserie",
