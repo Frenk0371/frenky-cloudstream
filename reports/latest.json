@@ -1,36 +1,26 @@
 {
-  "checked_at_utc": "2026-11-16T13:34:43+00:00",
-  "automatic_updates": [],
-  "needs_review": [
+  "checked_at_utc": "2026-11-17T14:18:51+00:00",
+  "automatic_updates": [
     {
-      "id": "eurostream",
-      "name": "Eurostream",
-      "checked_url": "https://eurostream.hair/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
+      "id": "guardaserie",
+      "previous": "https://guardaseriex.work/",
+      "new": "https://guardaseriex.lol/"
     },
     {
       "id": "streamingcommunity",
-      "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.nexus/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
+      "previous": "https://streamingcommunityz.nexus/",
+      "new": "https://streamingcommunityz.dad/"
     }
   ],
+  "needs_review": [],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
       "checked_url": "https://eurostream.hair/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
+      "status": "ok",
+      "http_code": 200,
+      "decision": "unchanged",
       "suggested_url": null,
       "redirects": []
     },
@@ -40,19 +30,31 @@
       "checked_url": "https://guardaseriex.work/",
       "status": "ok",
       "http_code": 200,
-      "decision": "unchanged",
-      "suggested_url": null,
-      "redirects": []
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://guardaseriex.lol/",
+      "redirects": [
+        {
+          "from": "https://guardaseriex.work/",
+          "to": "https://guardaseriex.lol/",
+          "status": 301
+        }
+      ]
     },
     {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
       "checked_url": "https://streamingcommunityz.nexus/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
+      "status": "ok",
+      "http_code": 200,
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://streamingcommunityz.dad/",
+      "redirects": [
+        {
+          "from": "https://streamingcommunityz.nexus/",
+          "to": "https://streamingcommunityz.dad/",
+          "status": 301
+        }
+      ]
     }
   ]
 }
