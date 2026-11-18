@@ -1,15 +1,10 @@
 {
-  "checked_at_utc": "2026-11-17T14:18:51+00:00",
+  "checked_at_utc": "2026-11-18T13:53:29+00:00",
   "automatic_updates": [
     {
-      "id": "guardaserie",
-      "previous": "https://guardaseriex.work/",
-      "new": "https://guardaseriex.lol/"
-    },
-    {
-      "id": "streamingcommunity",
-      "previous": "https://streamingcommunityz.nexus/",
-      "new": "https://streamingcommunityz.dad/"
+      "id": "eurostream",
+      "previous": "https://eurostream.hair/",
+      "new": "https://eurostream.skin/"
     }
   ],
   "needs_review": [],
@@ -20,41 +15,35 @@
       "checked_url": "https://eurostream.hair/",
       "status": "ok",
       "http_code": 200,
+      "decision": "auto_approved_redirect",
+      "suggested_url": "https://eurostream.skin/",
+      "redirects": [
+        {
+          "from": "https://eurostream.hair/",
+          "to": "https://eurostream.skin/",
+          "status": 301
+        }
+      ]
+    },
+    {
+      "id": "guardaserie",
+      "name": "GuardaSerie",
+      "checked_url": "https://guardaseriex.lol/",
+      "status": "ok",
+      "http_code": 200,
       "decision": "unchanged",
       "suggested_url": null,
       "redirects": []
     },
     {
-      "id": "guardaserie",
-      "name": "GuardaSerie",
-      "checked_url": "https://guardaseriex.work/",
-      "status": "ok",
-      "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://guardaseriex.lol/",
-      "redirects": [
-        {
-          "from": "https://guardaseriex.work/",
-          "to": "https://guardaseriex.lol/",
-          "status": 301
-        }
-      ]
-    },
-    {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.nexus/",
+      "checked_url": "https://streamingcommunityz.dad/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://streamingcommunityz.dad/",
-      "redirects": [
-        {
-          "from": "https://streamingcommunityz.nexus/",
-          "to": "https://streamingcommunityz.dad/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     }
   ]
 }
