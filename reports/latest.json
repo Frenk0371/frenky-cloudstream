@@ -1,36 +1,15 @@
 {
-  "checked_at_utc": "2026-11-19T14:22:12+00:00",
+  "checked_at_utc": "2026-11-20T13:57:45+00:00",
   "automatic_updates": [],
-  "needs_review": [
-    {
-      "id": "eurostream",
-      "name": "Eurostream",
-      "checked_url": "https://eurostream.skin/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
-    },
-    {
-      "id": "streamingcommunity",
-      "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.dad/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
-      "suggested_url": null,
-      "redirects": []
-    }
-  ],
+  "needs_review": [],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
       "checked_url": "https://eurostream.skin/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
+      "status": "ok",
+      "http_code": 200,
+      "decision": "unchanged",
       "suggested_url": null,
       "redirects": []
     },
@@ -48,9 +27,9 @@
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
       "checked_url": "https://streamingcommunityz.dad/",
-      "status": "blocked_or_error",
-      "http_code": 403,
-      "decision": "not_updated",
+      "status": "ok",
+      "http_code": 200,
+      "decision": "unchanged",
       "suggested_url": null,
       "redirects": []
     }
