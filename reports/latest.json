@@ -1,71 +1,37 @@
 {
-  "checked_at_utc": "2026-11-24T15:47:16+00:00",
-  "automatic_updates": [
-    {
-      "id": "eurostream",
-      "previous": "https://eurostream.skin/",
-      "new": "https://eurostream.homes/"
-    },
-    {
-      "id": "guardaserie",
-      "previous": "https://guardaseriex.lol/",
-      "new": "https://guardaseriex.help/"
-    },
-    {
-      "id": "streamingcommunity",
-      "previous": "https://streamingcommunityz.dad/",
-      "new": "https://streamingcommunityz.mov/"
-    }
-  ],
+  "checked_at_utc": "2026-11-25T15:31:16+00:00",
+  "automatic_updates": [],
   "needs_review": [],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
-      "checked_url": "https://eurostream.skin/",
+      "checked_url": "https://eurostream.homes/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://eurostream.homes/",
-      "redirects": [
-        {
-          "from": "https://eurostream.skin/",
-          "to": "https://eurostream.homes/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     },
     {
       "id": "guardaserie",
       "name": "GuardaSerie",
-      "checked_url": "https://guardaseriex.lol/",
+      "checked_url": "https://guardaseriex.help/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://guardaseriex.help/",
-      "redirects": [
-        {
-          "from": "https://guardaseriex.lol/",
-          "to": "https://guardaseriex.help/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     },
     {
       "id": "streamingcommunity",
       "name": "StreamingCommunity",
-      "checked_url": "https://streamingcommunityz.dad/",
+      "checked_url": "https://streamingcommunityz.mov/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://streamingcommunityz.mov/",
-      "redirects": [
-        {
-          "from": "https://streamingcommunityz.dad/",
-          "to": "https://streamingcommunityz.mov/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     }
   ]
 }
