@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-24T15:47:16+00:00",
+  "updated_at": "2026-11-27T14:58:00+00:00",
   "sources": [
     {
       "id": "eurostream",
       "name": "Eurostream",
       "original_url": "https://eurostream.pics/",
-      "current_url": "https://eurostream.homes/",
+      "current_url": "https://eurostream.beer/",
       "manual_aliases": [
         "https://eurostreamings.yachts/"
       ]
