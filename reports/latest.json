@@ -1,29 +1,17 @@
 {
-  "checked_at_utc": "2026-11-27T14:58:00+00:00",
-  "automatic_updates": [
-    {
-      "id": "eurostream",
-      "previous": "https://eurostream.homes/",
-      "new": "https://eurostream.beer/"
-    }
-  ],
+  "checked_at_utc": "2026-11-28T14:07:28+00:00",
+  "automatic_updates": [],
   "needs_review": [],
   "results": [
     {
       "id": "eurostream",
       "name": "Eurostream",
-      "checked_url": "https://eurostream.homes/",
+      "checked_url": "https://eurostream.beer/",
       "status": "ok",
       "http_code": 200,
-      "decision": "auto_approved_redirect",
-      "suggested_url": "https://eurostream.beer/",
-      "redirects": [
-        {
-          "from": "https://eurostream.homes/",
-          "to": "https://eurostream.beer/",
-          "status": 301
-        }
-      ]
+      "decision": "unchanged",
+      "suggested_url": null,
+      "redirects": []
     },
     {
       "id": "guardaserie",
